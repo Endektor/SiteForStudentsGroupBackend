@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^api/days/(?P<date>[0-9]+)$', views.days_list),
     url(r'^api/letters/$', views.letters_list),
     url(r'^api/letters/(?P<id>[0-9]+)$', views.letters_detail),
+    url(r'^api/info/$', views.info_list),
 ]
