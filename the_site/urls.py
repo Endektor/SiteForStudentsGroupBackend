@@ -16,13 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from backend import views
+from calendar_app import views as calendar_views
+from mail_app import views as mail_views
 from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^api/days/(?P<date>[0-9]+)$', views.days_list),
-    url(r'^api/letters/$', views.letters_list),
-    url(r'^api/letters/(?P<id>[0-9]+)$', views.letters_detail),
-    url(r'^api/info/$', views.info_list),
+    url(r'^api/days/(?P<date>[0-9]+)$', calendar_views.days_list),
+    url(r'^api/info/$', calendar_views.info_list),
+    url(r'^api/letters/$', mail_views.letters_list),
+    url(r'^api/letters/(?P<id>[0-9]+)$', mail_views.letters_detail),
 ]
