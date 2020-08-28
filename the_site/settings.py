@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'calendar_app',
     'mail_app',
+    'demos_news_app',
     'colorfield'
 ]
 

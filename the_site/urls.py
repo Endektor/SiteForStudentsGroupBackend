@@ -18,6 +18,7 @@ from django.urls import path
 
 from calendar_app import views as calendar_views
 from mail_app import views as mail_views
+from demos_news_app import views as demos_news_views
 from django.conf.urls import url
 
 urlpatterns = [
@@ -26,4 +27,6 @@ urlpatterns = [
     url(r'^api/info/$', calendar_views.info_list),
     url(r'^api/letters/$', mail_views.letters_list),
     url(r'^api/letters/(?P<id>[0-9]+)$', mail_views.letters_detail),
+    url(r'^api/demosnews/$', demos_news_views.posts_list),
+    url(r'^api/demosnews/(?P<id>[0-9]+)$', demos_news_views.posts_detail),
 ]
