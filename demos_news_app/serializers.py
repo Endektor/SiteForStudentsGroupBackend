@@ -9,16 +9,20 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username')
 
 
-class PostSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Post
-        fields = ('id', 'title', 'text', 'date', 'author')
-        depth = 1
-
-
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('id', 'name', 'post')
+
+
+class PostSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+    tag = TagSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Post
+        fields = ('id', 'title', 'text', 'date', 'author', 'tag')
+        depth = 1
+
+
+

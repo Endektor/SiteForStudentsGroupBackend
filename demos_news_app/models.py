@@ -15,7 +15,7 @@ class Post(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=128, unique=True)
-    post = models.ManyToManyField(Post, related_name='post')
+    post = models.ManyToManyField(Post, related_name='tag')
 
     def __str__(self):
         return self.name

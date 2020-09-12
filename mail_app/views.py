@@ -16,7 +16,7 @@ def letters_list(request):
         data = []
         nextPage = 1
         prevPage = 1
-        letters = Letter.objects.all()
+        letters = Letter.objects.all().order_by('mailer')
         page = request.GET.get('page', 1)
         paginator = Paginator(letters, 10)
         try:
