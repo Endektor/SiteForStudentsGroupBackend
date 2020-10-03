@@ -1,3 +1,4 @@
 /frontend
 /media
 db*
+*/migrations/

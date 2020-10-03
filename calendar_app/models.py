@@ -18,7 +18,7 @@ class Day(models.Model):
 
 class Event(models.Model):
     description = models.TextField(blank=True)
-    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name='event')
+    day = models.ForeignKey(Day, null=True, on_delete=models.CASCADE, related_name='event')
     event_info = models.ForeignKey('Info', null=True, on_delete=models.SET_NULL, related_name='event_info')
     time = models.TimeField(default=timezone.now)
 
