@@ -1,58 +1,46 @@
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import permissions
+from rest_framework import generics
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from demos_news_app.permissions import IsOwnerOrReadOnly
 from .models import Post, Tag
 from .serializers import *
 
 
-@api_view(['GET', 'Post'])
-def posts_list(request):
-    """
-    List of posts.
-    """
-    if request.method == 'GET':
-        data = []
-        tag = request.GET.get('tag', 0)
+class LocalPagination(PageNumberPagination):
+    page_size = 3
+
+
+class PostList(generics.ListCreateAPIView):
+    queryset = Post.objects.all().order_by('date')
+    serializer_class = PostSerializer
+    pagination_class = LocalPagination
+
+    def get_queryset(self):
+        tag = self.request.GET.get('tag', 0)
         if int(tag):
-            posts = Post.objects.filter(tag=tag).order_by('date')
+            return Post.objects.filter(tag=tag).order_by('date')
         else:
-            posts = Post.objects.all().order_by('date')
-        page = request.GET.get('page', 1)
-        paginator = Paginator(posts, 3)
-        try:
-            data = paginator.page(page)
-        except PageNotAnInteger:
-            data = paginator.page(1)
-        except EmptyPage:
-            data = paginator.page(paginator.num_pages)
+            return Post.objects.all().order_by('date')
 
-        posts_page = PostSerializer(data, context={'request': request}, many=True)
-
-        tags = Tag.objects.all()
-        tags = TagSerializer(tags, context={'request': request}, many=True)
-
-        return Response({'postsPage': posts_page.data,
-                         'tags': tags.data,
-                         'count': paginator.count,
-                         'numPages': paginator.num_pages,
-                         })
-
-    if request.method == 'Post':
-        pass
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
-@api_view(['GET'])
-def posts_detail(request, id):
-    """
-    Get letter by id.
-    """
-    try:
-        letter = Letter.objects.get(id=id)
-    except Letter.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    lookup_field = 'id'
+    permission_classes = [IsOwnerOrReadOnly, permissions.IsAuthenticated]
 
-    if request.method == 'GET':
-        serializer = LetterSerializer(letter, context={'request': request})
-        return Response(serializer.data)
+
+class TagList(generics.ListCreateAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+class TagDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    lookup_field = 'id'
+    permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated]

@@ -5,8 +5,6 @@ from .models import Post, Tag
 # class TagInline(admin.TabularInline):
 #     model = Tag
 #     extra = 0
-#
-#
 
 
 class TagInline(admin.TabularInline):

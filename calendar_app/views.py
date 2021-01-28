@@ -1,39 +1,42 @@
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
+from rest_framework.generics import get_object_or_404
+from rest_framework import generics
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Day, Info, Event
 from .serializers import *
 
 
-@api_view(['GET'])
-def days_list(request, date):
-    """
-    List of days or a day.
-    """
-    if request.method == 'GET':
-        if len(date) == 6:
-            year = date[0:4]
-            month = date[4:]
-            data = Day.objects.filter(date__year=year).filter(date__month=month)
-            serializer = DaySerializer(data, context={'request': request}, many=True)
+class Dayslist(generics.ListAPIView):
+    queryset = Day.objects.all()
+    serializer_class = DaySerializer
 
-        else:
-            try:
-                day = Day.objects.get(date__year=date[0:4], date__month=date[4:6], date__day=date[6:8])
-            except Day.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            serializer = DaySerializer(day, context={'request': request})
-        return Response({'data': serializer.data})
+    def get_queryset(self):
+        year = self.kwargs.get('year', 0)
+        month = self.kwargs.get('month', 0)
+        print(month, year)
+        return Day.objects.filter(date__year=year, date__month=month)
 
 
-@api_view(['GET'])
-def info_list(request):
-    """
-    List info models.
-    """
-    if request.method == 'GET':
-        data = Info.objects.all()
-        serializer = InfoSerializer(data, context={'request': request}, many=True)
-        return Response({'data': serializer.data})
+class DayDetail(generics.RetrieveAPIView):
+    queryset = Day.objects.all()
+    serializer_class = DaySerializer
+    lookup_field = 0
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        year = self.kwargs.get('year', 0)
+        month = self.kwargs.get('month', 0)
+        day = self.kwargs.get('day', 0)
+        obj = get_object_or_404(queryset, date__year=year, date__month=month, date__day=day)
+        return obj
+
+
+class Infolist(generics.ListAPIView):
+    queryset = Info.objects.all()
+    serializer_class = InfoSerializer
+
+
+# class TagDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Tag.objects.all()
+#     serializer_class = TagSerializer
+#     lookup_field = 'id'
+#     permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated]

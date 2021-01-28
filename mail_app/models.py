@@ -1,7 +1,6 @@
 from django.db import models
 from datetime import date
 from django.utils import timezone
-from colorfield.fields import ColorField
 
 
 class Letter(models.Model):
