@@ -3,6 +3,7 @@ import os
 from time import sleep
 from django.apps import AppConfig
 from multiprocessing import Process
+
 from .mail_service import Service
 
 
@@ -22,6 +23,65 @@ class MailAppConfig(AppConfig):
                 not os.environ.get('Mail_env', None) == 'true':
             p = Process(target=MailAppConfig.start_mail_service)
             p.start()
+
+    # @staticmethod
+    # def test():
+    #     import imaplib
+    #     import email
+    #     USERNAME = "v.nikolaev55555@gmail.com"
+    #     PASSWORD = "kobudicqkwwxtgrk"
+    #     imap = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+    #     imap.login(USERNAME, PASSWORD)
+    #     imap.select('INBOX')
+    #     # if sender_of_interest:
+    #     status, response = imap.uid('search', '453')
+    #     # else:
+    #     # status, response = imap.uid('search', None, 'UNSEEN')
+    #     if status == 'OK':
+    #         unread_msg_nums = response[0].split()
+    #     else:
+    #         unread_msg_nums = []
+    #     data_list = []
+    #     for e_id in unread_msg_nums:
+    #         e_id = e_id.decode('utf-8')
+    #         _, response = imap.uid('fetch', e_id, '(RFC822)')
+    #         html = response[0][1].decode('utf-8')
+    #         email_message = email.message_from_string(html)
+    #         data_list.append(email_message.get_payload())
+    #     for elem in data_list:
+    #         print(elem)
+
+    @staticmethod
+    def test():
+        import ezgmail
+        # import json
+        # USERNAME = "v.nikolaev55555@gmail.com"
+        # PASSWORD = "kobudicqkwwxtgrk"
+        # with open('token.json', 'w') as data_file:
+        #     json.dump(USERNAME, data_file)
+        # with open('credentials.json', 'w') as data_file:
+        #     json.dump(PASSWORD, data_file)
+        # ezgmail.init(tokenFile='token.json', credentialsFile='credentials.json')
+        # ezgmail.init()
+
+        letter = ezgmail.search("")[0].messages[0]
+        print(letter.sender)
+        print(letter.timestamp)
+        print(letter.subject)
+        print(letter.body)
+        print(letter.attachments)
+        print(ezgmail.summary(letter, printInfo=False))
+        # with open('mail_app/mail_data.json', 'wb') as data_file:
+        #     import pickle
+        #     pickle.dump(ezgmail.summary(letter, printInfo=False), data_file)
+
+
+
+        # print(ezgmail.LOGGED_IN)
+
+
+
+
 
     # @staticmethod
     # def test():
