@@ -1,5 +1,6 @@
 from datetime import timedelta
 import os
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -9,10 +10,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '9atuzf-5gz-p(kya2yd*xjkz=#16zm9^7o(c+-iq_i#9rp%cy*'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 #ALLOWED_HOSTS = ['*']
 
@@ -102,8 +103,8 @@ LOGIN_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "v.nikolaev55555@gmail.com"
-EMAIL_HOST_PASSWORD = "kobudicqkwwxtgrk"
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 
 # Database
@@ -178,7 +179,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR + 'static'
+STATIC_ROOT = BASE_DIR + '/static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR + 'media'
+MEDIA_ROOT = BASE_DIR + '/media'

@@ -1,6 +1,5 @@
 import pickle
 import ezgmail
-from django.utils.timezone import make_aware
 
 
 class Service:

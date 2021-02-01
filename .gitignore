@@ -2,3 +2,8 @@
 /media
 db*
 */migrations/
+token.json
+credentials.json
+debug.log
+.env
+mail_app/mail_data.json
