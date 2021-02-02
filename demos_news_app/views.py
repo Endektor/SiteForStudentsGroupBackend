@@ -6,6 +6,8 @@ from demos_news_app.permissions import IsOwnerOrReadOnly
 from .models import Post, Tag
 from .serializers import *
 
+from icecream import ic
+
 
 class LocalPagination(PageNumberPagination):
     page_size = 3
@@ -17,14 +19,25 @@ class PostList(generics.ListCreateAPIView):
     pagination_class = LocalPagination
 
     def get_queryset(self):
-        tag = self.request.GET.get('tag', 0)
-        if int(tag):
-            return Post.objects.filter(tag=tag).order_by('date')
-        else:
+        tags = self.request.GET.get('tags', 'error')
+
+        try:
+            tags = tags.split(',')
+            tags = list(map(int, tags))
+            posts = Post.objects.filter(tag__in=tags)
+            return posts.order_by('date')
+
+        except ValueError:
             return Post.objects.all().order_by('date')
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        tags = self.request.data.get('tags', None)
+        if tags:
+            tags = list(map(int, tags.split(',')))
+            tags = Tag.objects.filter(id__in=tags)
+            serializer.save(author=self.request.user, tags=tags)
+        else:
+            serializer.save(author=self.request.user)
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -32,6 +45,16 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
     lookup_field = 'id'
     permission_classes = [IsOwnerOrReadOnly, permissions.IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        tags = request.data.get('tags', None)
+        if tags:
+            tags = list(map(int, tags.split(',')))
+            post = Post.objects.get(id=kwargs.get('id'))
+            post.tags.set(Tag.objects.filter(id__in=tags))
+            post.save()
+
+        return self.update(request, *args, **kwargs)
 
 
 class TagList(generics.ListCreateAPIView):
