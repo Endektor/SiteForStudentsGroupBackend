@@ -1,5 +1,6 @@
 /frontend
 /media
+/static
 db*
 */migrations/
 token.json
