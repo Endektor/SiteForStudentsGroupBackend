@@ -3,6 +3,7 @@
 /static
 db*
 */migrations/
+*/__pycache__/
 token.json
 credentials.json
 debug.log
