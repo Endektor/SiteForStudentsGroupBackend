@@ -10,11 +10,11 @@ from .mail_service import Service
 
 
 class LocalPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 10
 
 
 class LettersList(generics.ListCreateAPIView):
-    queryset = Letter.objects.all()
+    queryset = Letter.objects.all().order_by('-date_time')
     serializer_class = LetterSerializer
     pagination_class = LocalPagination
     # permission_classes = [permissions.IsAuthenticated]
