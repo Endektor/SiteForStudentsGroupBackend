@@ -15,7 +15,9 @@ urlpatterns = [
     url(r'^api/demosnews/', include('demos_news_app.urls')),
 
     url(r'^auth/', include('djoser.urls')),
-    url(r'^auth/', include('djoser.urls.jwt')),
+    # url(r'^auth/', include('djoser.urls.jwt')),
+    url(r'^auth/', include('custom_auth.urls')),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

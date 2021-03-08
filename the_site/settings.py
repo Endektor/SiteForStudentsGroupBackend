@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'calendar_app',
     'mail_app',
     'demos_news_app',
+    'custom_auth',
 ]
 
 MIDDLEWARE = [
@@ -93,8 +94,8 @@ DJOSER = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
