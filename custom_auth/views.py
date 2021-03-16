@@ -12,9 +12,9 @@ class Create(APIView):
     def post(self, request, *args, **kwargs):
         username = request.POST['username']
         password = request.POST['password']
-        try:
-            user = authenticate(username=username, password=password)
-        except AttributeError:
+
+        user = authenticate(username=username, password=password)
+        if not user:
             return Response({'error': "User does not exist or password is incorrect"}, status=400)
 
         refresh = RefreshToken.for_user(user)
