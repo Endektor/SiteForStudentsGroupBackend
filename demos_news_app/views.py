@@ -2,7 +2,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import permissions
 from rest_framework import generics
 
-from demos_news_app.permissions import IsOwnerOrReadOnly
+from demos_news_app.permissions import IsOwnerOrReadOnly, IsGroupMember
 from .models import Post, Tag
 from .serializers import *
 
@@ -66,4 +66,4 @@ class TagDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     lookup_field = 'id'
-    permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated]
+    permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated, IsGroupMember]
