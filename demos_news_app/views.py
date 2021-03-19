@@ -1,30 +1,28 @@
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import permissions
-from rest_framework import generics
+from rest_framework import permissions, generics
 
-from demos_news_app.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup
-from .models import Post, Tag
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup
 from custom_auth.models import Group
-from .serializers import *
+from custom_auth.views import GroupListCreateAPIView
+from rest_framework.response import Response
 
-from icecream import ic
+from .models import Post, Tag
+from .serializers import *
 
 
 class LocalPagination(PageNumberPagination):
     page_size = 5
 
 
-class PostList(generics.ListCreateAPIView):
+class PostList(GroupListCreateAPIView):
     queryset = Post.objects.all().order_by('date')
     serializer_class = PostSerializer
     pagination_class = LocalPagination
     permission_classes = [permissions.IsAuthenticated, IsGroupMember]
 
     def get_queryset(self):
+        super(PostList, self).get_queryset()
         tags = self.request.GET.get('tags', None)
-        group = self.request.GET.get('group', None)
-        group = Group.objects.get(name=group)
-        self.queryset = self.queryset.filter(group=group)
 
         try:
             tags = tags.split(',')
@@ -37,12 +35,14 @@ class PostList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         tags = self.request.data.get('tags', None)
+        group = self.request.data.get('group')
+        group = Group.objects.get(name=group)   # It cant throw an exception because it has been checked in permissions
         if tags:
             tags = list(map(int, tags.split(',')))
             tags = Tag.objects.filter(id__in=tags)
-            serializer.save(author=self.request.user, tags=tags)
+            serializer.save(author=self.request.user, group=group, tags=tags)
         else:
-            serializer.save(author=self.request.user)
+            serializer.save(author=self.request.user, group=group)
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -62,17 +62,10 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
         return self.update(request, *args, **kwargs)
 
 
-class TagList(generics.ListCreateAPIView):
+class TagList(GroupListCreateAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [permissions.IsAuthenticated, IsGroupMember]
-
-    def get_queryset(self):
-        group = self.request.GET.get('group', None)
-        group = Group.objects.get(name=group)
-        self.queryset = self.queryset.filter(group=group)
-
-        return self.queryset
 
 
 class TagDetail(generics.RetrieveUpdateDestroyAPIView):

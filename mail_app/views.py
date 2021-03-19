@@ -5,26 +5,28 @@ from rest_framework import generics, permissions
 
 from .models import Letter
 from .serializers import *
-
 from .mail_service import Service
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup
+from custom_auth.models import Group
+from custom_auth.views import GroupListCreateAPIView
 
 
 class LocalPagination(PageNumberPagination):
     page_size = 10
 
 
-class LettersList(generics.ListCreateAPIView):
+class LettersList(GroupListCreateAPIView):
     queryset = Letter.objects.all().order_by('-date_time')
     serializer_class = LetterSerializer
     pagination_class = LocalPagination
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
 
 
 class LetterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Letter.objects.all()
     serializer_class = LetterSerializer
     lookup_field = 'id'
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember, IsOwnerOrReadOnly]
 
 
 class CheckEmail(View):

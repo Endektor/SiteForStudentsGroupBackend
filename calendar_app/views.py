@@ -1,25 +1,31 @@
 from rest_framework.generics import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, permissions
 
 from .models import Day, Info, Event
 from .serializers import *
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup
+from custom_auth.models import Group
+from custom_auth.views import GroupListCreateAPIView
 
 
-class Dayslist(generics.ListAPIView):
+class Dayslist(GroupListCreateAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
 
     def get_queryset(self):
+        super(Dayslist, self).get_queryset()
         year = self.kwargs.get('year', 0)
         month = self.kwargs.get('month', 0)
-        print(month, year)
-        return Day.objects.filter(date__year=year, date__month=month)
+        self.queryset = self.queryset.filter(date__year=year, date__month=month)
+        return self.queryset
 
 
-class DayDetail(generics.RetrieveAPIView):
+class DayDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
     lookup_field = 0
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember, IsOwnerOrReadOnly]
 
     def get_object(self):
         queryset = self.get_queryset()
@@ -30,10 +36,10 @@ class DayDetail(generics.RetrieveAPIView):
         return obj
 
 
-class Infolist(generics.ListAPIView):
+class Infolist(GroupListCreateAPIView):
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
-
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
 
 # class TagDetail(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = Tag.objects.all()

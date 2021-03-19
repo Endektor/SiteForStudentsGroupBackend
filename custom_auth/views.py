@@ -4,6 +4,9 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
+from rest_framework import generics
+
+from .models import Group
 
 
 class Create(APIView):
@@ -56,3 +59,22 @@ class Verify(APIView):
 
         response = Response({'result': "OK"}, status=200)
         return response
+
+
+class GroupListCreateAPIView(generics.ListCreateAPIView):
+
+    def get_queryset(self):
+        group = self.request.GET.get('group', None)
+        group = Group.objects.get(name=group)
+        year = self.kwargs.get('year', 0)
+        month = self.kwargs.get('month', 0)
+        self.queryset = self.queryset.filter(date__year=year, date__month=month, group=group)
+        return self.queryset
+
+    def perform_create(self, serializer):
+        group = self.request.data.get('group')
+        group = Group.objects.get(name=group)   # It cant throw an exception because it has been checked in permissions
+        serializer.save(group=group)
+
+# class GroupCreate(generics.CreateAPIView):
+#

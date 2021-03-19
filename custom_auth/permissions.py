@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from custom_auth.models import Group
+from .models import Group
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -12,9 +12,18 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 
 class IsGroupMember(permissions.BasePermission):
+    message = 'Вы не состоите в данной группе'
+
     def has_permission(self, request, view):
         group = request.GET.get('group', None)
-        group = Group.objects.get(name=group)
+        if not group:
+            self.message = 'Не была предоставлена группа'
+            return False
+        try:
+            group = Group.objects.get(name=group)
+        except Group.DoesNotExist:
+            self.message = 'Данной группы не существует'
+            return False
 
         return group in request.user.group.all()
 
