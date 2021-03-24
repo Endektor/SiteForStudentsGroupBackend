@@ -1,12 +1,12 @@
-from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
-from rest_framework import generics
+from rest_framework import generics, permissions
 
 from .models import Group
+from .serializers import GroupSerializer, GroupPermissionSerializer
 
 
 class Create(APIView):
@@ -66,15 +66,29 @@ class GroupListCreateAPIView(generics.ListCreateAPIView):
     def get_queryset(self):
         group = self.request.GET.get('group', None)
         group = Group.objects.get(name=group)
-        year = self.kwargs.get('year', 0)
-        month = self.kwargs.get('month', 0)
-        self.queryset = self.queryset.filter(date__year=year, date__month=month, group=group)
-        return self.queryset
+        self.queryset = self.queryset.filter(group=group)
 
     def perform_create(self, serializer):
         group = self.request.data.get('group')
         group = Group.objects.get(name=group)   # It cant throw an exception because it has been checked in permissions
         serializer.save(group=group)
 
-# class GroupCreate(generics.CreateAPIView):
-#
+
+class GroupCreate(generics.CreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        group = serializer.save()
+        role_serializer = GroupPermissionSerializer(data={'group': group,
+                                                          'user': self.request.user,
+                                                          'role': 'admin'})
+        if role_serializer.is_valid():
+            role_serializer.save()
+
+
+class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = [permissions.IsAuthenticated]

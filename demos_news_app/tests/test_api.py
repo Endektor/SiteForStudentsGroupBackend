@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.utils import timezone
 
+from custom_auth.models import User
 from demos_news_app.models import Post
 from demos_news_app.serializers import PostSerializer
 

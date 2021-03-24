@@ -4,10 +4,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
 
-from custom_auth import views as auth_views
+from .views import *
 
 urlpatterns = [
-    url('jwt/create/$', auth_views.Create.as_view()),
-    url('jwt/refresh/$', auth_views.Refresh.as_view()),
-    url('jwt/verify/$', auth_views.Verify.as_view()),
+    url('jwt/create/$', Create.as_view()),
+    url('jwt/refresh/$', Refresh.as_view()),
+    url('jwt/verify/$', Verify.as_view()),
+    url(r'group/$', GroupCreate.as_view())
 ]
