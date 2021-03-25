@@ -3,10 +3,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 
 from .models import Group
-from .serializers import GroupSerializer, GroupPermissionSerializer
+from .serializers import GroupSerializer, GroupPermissionSerializer, GetGroupSerializer
 
 
 class Create(APIView):
@@ -79,16 +79,28 @@ class GroupCreate(generics.CreateAPIView):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data.update({'users': request.user.id})
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        group = self.perform_create(serializer)
+
+        serializer_role = GroupPermissionSerializer(data={'group': group.id,
+                                                          'user': request.user.id,
+                                                          'role': 'admin'})
+        serializer_role.is_valid(raise_exception=True)
+        self.perform_create(serializer_role)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def perform_create(self, serializer):
         group = serializer.save()
-        role_serializer = GroupPermissionSerializer(data={'group': group,
-                                                          'user': self.request.user,
-                                                          'role': 'admin'})
-        if role_serializer.is_valid():
-            role_serializer.save()
+        return group
 
 
 class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+    serializer_class = GetGroupSerializer
     permission_classes = [permissions.IsAuthenticated]

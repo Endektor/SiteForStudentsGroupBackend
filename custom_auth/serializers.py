@@ -7,12 +7,13 @@ from .models import Group, GroupPermission
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
+        ref_name = 'group_user'
         model = User
-        fields = ('id', 'name', 'users')
+        fields = ('id', 'username')
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    users = UserSerializer(many=True)
+    # users = UserSerializer(many=True)
 
     class Meta:
         model = Group
@@ -20,7 +21,24 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class GroupPermissionSerializer(serializers.ModelSerializer):
+    # group = GroupSerializer()
+
+    class Meta:
+        model = GroupPermission
+        fields = ('id', 'group', 'user', 'role')
+
+
+class GetGroupSerializer(serializers.ModelSerializer):
+    users = UserSerializer(many=True)
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name', 'users')
+
+
+class GetGroupPermissionSerializer(serializers.ModelSerializer):
     group = GroupSerializer()
+    user = UserSerializer(many=True)
 
     class Meta:
         model = GroupPermission

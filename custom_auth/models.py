@@ -4,6 +4,8 @@ from django.db import models
 
 class User(AbstractUser):
     pass
+    # class Meta:
+    #     ref_name="test"
 
 
 class Group(models.Model):

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'djoser',
 
     'colorfield',
+    'drf_yasg',
     
     'calendar_app',
     'mail_app',

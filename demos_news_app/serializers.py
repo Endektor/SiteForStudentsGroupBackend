@@ -2,12 +2,14 @@ from rest_framework import serializers
 from .models import Post, Tag
 
 from custom_auth.models import User
+from custom_auth.serializers import UserSerializer
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserPostsSerializer(UserSerializer):
     posts = serializers.PrimaryKeyRelatedField(many=True, queryset=Post.objects.all())
 
     class Meta:
+        ref_name = 'posts_user'
         model = User
         fields = ('id', 'username', 'posts')
 
