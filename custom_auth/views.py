@@ -6,15 +6,19 @@ from django.contrib.auth import authenticate
 from rest_framework import generics, permissions, status
 
 from .models import Group
-from .serializers import GroupSerializer, GroupPermissionSerializer, GetGroupSerializer
+from .serializers import GroupSerializer, GroupPermissionSerializer, GetGroupSerializer, TokenSerializer
 
 
-class Create(APIView):
+class Create(generics.GenericAPIView):
+    serializer_class = TokenSerializer  # delete
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        if not username:    # delete
+            username = request.data['username']     # delete
+            password = request.data['password']     # delete
         try:
             user = authenticate(username=username, password=password)
         except AttributeError:

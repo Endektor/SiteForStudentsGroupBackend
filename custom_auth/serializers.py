@@ -1,8 +1,11 @@
-from django.contrib.auth import get_user_model
-User = get_user_model()
 from rest_framework import serializers
 
-from .models import Group, GroupPermission
+from .models import Group, GroupPermission, User
+
+
+class TokenSerializer(serializers.BaseSerializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
 
 
 class UserSerializer(serializers.ModelSerializer):
