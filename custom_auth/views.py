@@ -5,14 +5,24 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
 from rest_framework import generics, permissions, status
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from .models import Group
 from .serializers import GroupSerializer, GroupPermissionSerializer, GetGroupSerializer, TokenSerializer
+
+
+username = openapi.Schema(title='username', type='string')
+password = openapi.Schema(title='password', type='string')
+response_schema_dict = openapi.Schema(title='lol', type='object',
+                                      properties={'username': username, 'password': password})
 
 
 class Create(generics.GenericAPIView):
     serializer_class = TokenSerializer  # delete
     permission_classes = []
 
+    @swagger_auto_schema(request_body=response_schema_dict)
     def post(self, request, *args, **kwargs):
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
