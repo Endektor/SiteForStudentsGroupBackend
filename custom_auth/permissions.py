@@ -25,9 +25,9 @@ class IsGroupMember(permissions.BasePermission):
             self.message = 'Данной группы не существует'
             return False
 
-        return group in request.user.group.all()
+        return group in request.user.users_in_group.all()
 
 
 class IsObjectInUsersGroup(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.group in request.user.group
+        return obj.group in request.user.users_in_group

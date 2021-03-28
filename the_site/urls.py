@@ -38,7 +38,7 @@ urlpatterns = [
 
     url(r'^auth/', include('djoser.urls')),
     # url(r'^auth/', include('djoser.urls.jwt')),
-    url(r'^auth/', include('custom_auth.urls')),
+    url(r'^api/', include('custom_auth.urls')),
 
 ]
 
