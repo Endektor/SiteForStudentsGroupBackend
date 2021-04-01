@@ -13,5 +13,6 @@ urlpatterns = [
 
     url(r'group/$', GroupCreate.as_view()),
     url(r'group/(?P<name>[a-zA-Z0-9_]+)$', GroupDetail.as_view()),
-    url(r'token/$', CreateGroupToken.as_view()),
+    url(r'token/appliance/$', TokenAppliance.as_view()),
+    url(r'token/$', GroupTokenCreate.as_view()),
 ]

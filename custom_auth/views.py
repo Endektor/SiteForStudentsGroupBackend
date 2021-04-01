@@ -130,14 +130,10 @@ class GroupCreate(generics.ListCreateAPIView):
                                                           'user': request.user.id,
                                                           'role': 'admin'})
         serializer_role.is_valid(raise_exception=True)
-        self.perform_create(serializer_role)
+        serializer_role.save()
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def perform_create(self, serializer):
-        group = serializer.save()
-        return group
 
 
 class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -150,20 +146,35 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'name'
 
 
-class CreateGroupToken(generics.GenericAPIView):
+class GroupTokenCreate(generics.ListCreateAPIView):
     """
-    Invitation to group token
-    returns token and adds user to group using token
+    List of user's tokens or token creation
     """
-    permission_classes = {'GET': [permissions.IsAuthenticated],
-                          'POST': [permissions.IsAuthenticated, IsGroupAdmin]}
+    queryset = GroupToken.objects.all()
+    serializer_class = GroupTokenSerializer
+    permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [permission() for permission in self.permission_classes['GET']]
-        else:
-            return [permission() for permission in self.permission_classes['POST']]
+    def get_queryset(self):
+        self.queryset = self.queryset.filter(group=self.request.GET.get('group', None))
+        return self.queryset
 
+    def create(self, request, *args, **kwargs):
+        role = request.POST.get('role', None)
+        group = request.GET.get('group', None)
+        group = Group.objects.get(name=group)
+        if role not in ('redactor', 'user'):
+            return Response({'error': "Select a valid role"}, status=400)
+
+        token = GroupTokenSerializer(data={'role': role, 'group': group.id})
+        token.is_valid(raise_exception=True)
+        token.save()
+        host = request.META['HTTP_HOST']
+        token_dict = dict(token.data)
+        token_dict['token_url'] = 'http://' + host + '/api/auth/token/?token=' + token_dict['token']
+        return Response(token_dict, status=200)
+
+
+class TokenAppliance(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         token = request.GET.get('token', None)
         if not token:
@@ -187,18 +198,3 @@ class CreateGroupToken(generics.GenericAPIView):
             role_obj.save()
         role_serializer = GroupPermissionSerializer(role_obj)
         return Response(role_serializer.data, status=200)
-
-    def post(self, request, *args, **kwargs):
-        role = request.POST.get('role', None)
-        group = request.GET.get('group', None)
-        group = Group.objects.get(name=group)
-        if role not in ('redactor', 'user'):
-            return Response({'error': "Select a valid role"}, status=400)
-
-        token = GroupTokenSerializer(data={'role': role, 'group': group.id})
-        token.is_valid(raise_exception=True)
-        token.save()
-        host = request.META['HTTP_HOST']
-        token_dict = dict(token.data)
-        token_dict['token'] = 'http://' + host + '/api/auth/token/?token=' + token_dict['token']
-        return Response(token_dict, status=200)
