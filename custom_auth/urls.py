@@ -10,6 +10,8 @@ urlpatterns = [
     url('jwt/create/$', Create.as_view()),
     url('jwt/refresh/$', Refresh.as_view()),
     url('jwt/verify/$', Verify.as_view()),
+
     url(r'group/$', GroupCreate.as_view()),
-    url(r'group/(?P<pk>[0-9]+)$', GroupDetail.as_view()),
+    url(r'group/(?P<name>[a-zA-Z0-9_]+)$', GroupDetail.as_view()),
+    url(r'token/$', CreateGroupToken.as_view()),
 ]
