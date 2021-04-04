@@ -26,8 +26,7 @@ class Create(generics.GenericAPIView):
     Authentication
     returns refresh token in cookies and access token in body
     """
-    serializer_class = TokenSerializer  # delete
-    permission_classes = []
+    serializer_class = TokenSerializer  # used by swagger
 
     @swagger_auto_schema(request_body=response_schema_dict)
     def post(self, request, *args, **kwargs):
@@ -59,16 +58,24 @@ class Refresh(APIView):
     Refresh the access token
     returns new access token in body
     """
-    permission_classes = []
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         refresh_old = request.COOKIES.get('refresh', None)
         try:
             refresh = RefreshToken(refresh_old)
         except TokenError:
             return Response({'error': "Invalid refresh token"}, status=400)
 
+        user = User.objects.get(id=refresh.get('user_id', None))
+        refresh = RefreshToken.for_user(user)
         response = Response({'access': str(refresh.access_token)}, status=200)
+        response.set_cookie(
+            'refresh',
+            str(refresh),
+            max_age=60 * 24 * 60 * 60,
+            # domain=,
+            # secure=settings.SESSION_COOKIE_SECURE or None,
+            httponly=True, )
         return response
 
 
@@ -76,7 +83,6 @@ class Verify(APIView):
     """
     Verification of access token
     """
-    permission_classes = []
 
     def post(self, request, *args, **kwargs):
         access = request.POST['access']
