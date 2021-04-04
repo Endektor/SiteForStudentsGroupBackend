@@ -9,44 +9,59 @@ from rest_framework.test import APITestCase
 def print_decorator(func):
     def wrapper(self, *args, **kwargs):
         print('Test: {}'.format(func.__name__), end='')
-        func(self, *args, **kwargs)
+        data = func(self, *args, **kwargs)
         print(' OK')
+        return data
     return wrapper
 
 
 class CustomAuthApiTest(APITestCase):
+    """
+    It follows the way user expected to behave
+    """
 
-    def auth(self, access):
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access)
+    def test_api(self):
+        self.user_create('test_name', 1)
+        self.login('test_name')
+        self.group_create()
+        self.get_user_groups()
+        self.get_group_users()
+        self.group_token_create('user', 1)
+        self.group_token_create('redactor', 2)
+        tokens = self.get_group_tokens()
+
+        self.user_create('test_name2', 2)
+        self.login('test_name2')
+        self.join_to_group(tokens[0], 'user')
+        self.join_to_group(tokens[1], 'redactor')
 
     @print_decorator
-    def user_create(self, name, id):
+    def user_create(self, username, id):
         url = '/api/auth/users/'
-        response = self.client.post(url, {'username': name,
+        response = self.client.post(url, {'username': username,
                                           'password': 'Alpine12'})
         expected_data = {
             'email': '',
-            'username': name,
+            'username': username,
             'id': id
         }
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expected_data, response.data)
-        user = User.objects.get(username='test_name')
+        user = User.objects.get(username=username)
         user.is_active = True
         user.save()
 
     @print_decorator
-    def login(self):
+    def login(self, username):
         url = '/api/auth/jwt/create/'
-        response = self.client.post(url, {'username': 'test_name',
+        response = self.client.post(url, {'username': username,
                                           'password': 'Alpine12'})
-        self.access = response.data['access']
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
 
     @print_decorator
     def group_create(self):
         url = '/api/auth/group/'
-        self.auth(self.access)
         response = self.client.post(url, {'name': 'group_name'})
         expected_data = {
             "id": 1,
@@ -61,7 +76,6 @@ class CustomAuthApiTest(APITestCase):
     @print_decorator
     def get_user_groups(self):
         url = '/api/auth/group/'
-        self.auth(self.access)
         response = self.client.get(url)
         expected_data = [
             {
@@ -78,7 +92,6 @@ class CustomAuthApiTest(APITestCase):
     @print_decorator
     def get_group_users(self):
         url = '/api/auth/group/group_name'
-        self.auth(self.access)
         response = self.client.get(url)
         expected_data = {
             "id": 1,
@@ -94,60 +107,46 @@ class CustomAuthApiTest(APITestCase):
         self.assertEqual(expected_data, response.data)
 
     @print_decorator
-    def group_token_create(self):
+    def group_token_create(self, role, expected_id):
         url = '/api/auth/token/?group=group_name'
-        self.auth(self.access)
-
-        def test(role, expected_id):
-            response = self.client.post(url, {'role': role})
-            expected_data = {
-                'id': expected_id,
-                'role': role,
-                'group': 1,
-                'creation_time': response.data['creation_time'],
-                'token': response.data['token'],
-                'token_url': 'http://localhost:8000/api/auth/token/?token=' + response.data['token']
-            }
-            self.assertEqual(status.HTTP_200_OK, response.status_code)
-            self.assertEqual(expected_data, response.data)
-        test('user', 1)
-        test('redactor', 2)
+        response = self.client.post(url, {'role': role})
+        expected_data = {
+            'id': expected_id,
+            'role': role,
+            'group': 1,
+            'creation_time': response.data['creation_time'],
+            'token': response.data['token'],
+            'token_url': 'http://localhost:8000/api/auth/token/?token=' + response.data['token']
+        }
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected_data, response.data)
 
     @print_decorator
-    def join_to_group(self):
-        pass
+    def get_group_tokens(self):
+        url = '/api/auth/token/?group=group_name'
+        response = self.client.get(url)
+        expected_data = [{'id': 1,
+                          'role': 'user',
+                          'group': 1,
+                          'creation_time': response.data[0]['creation_time'],
+                          'token': response.data[0]['token']},
+                         {'id': 2,
+                          'role': 'redactor',
+                          'group': 1,
+                          'creation_time': response.data[1]['creation_time'],
+                          'token': response.data[1]['token']}]
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected_data, response.data)
+        tokens = [response.data[0]['token'], response.data[1]['token']]
+        return tokens
 
-    def test_api(self):
-        self.user_create('test_name', 1)
-        self.login()
-        self.group_create()
-        self.get_user_groups()
-        self.get_group_users()
-        self.group_token_create()
-
-        self.user_create('test_name2', 2)
-        self.join_to_group()
-
-    #     # group_1 = Group.objects.create(name='test1')
-    #     # group_2 = Group.objects.create(name='test2')
-    #     user_1 = User.objects.create(username='user1', password='password1')
-    #     user_2 = User.objects.create(username='user2', password='password2')
-    #     user_1.is_active = True
-    #     self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token.key)
-    #     user_2.is_active = True
-    #     # group_permission_1 = GroupPermission.objects.create(date='2020-09-01', topic='Day1')
-    #     # group_permission_2 = GroupPermission.objects.create(date='2020-09-02', topic='Day2')
-    #     create_group = '/auth/group/'
-    #     response = self.client.post(create_group, {'name': 'group_name'})
-    #     expected_data = """
-    #     {
-    #         'id': 1,
-    #         'name': 'group_name',
-    #         'users': [
-    #             1
-    #         ]
-    #     }
-    #     """
-    #     expected_data = json.dumps(expected_data)
-    #     self.assertEqual(status.HTTP_201_CREATED, response.status_code)
-    #     self.assertEqual(expected_data, response.data)
+    @print_decorator
+    def join_to_group(self, token, role):
+        url = '/api/auth/token/appliance/?token=' + token
+        response = self.client.get(url)
+        expected_data = {'id': 2,
+                         'group': 1,
+                         'user': 2,
+                         'role': role}
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected_data, response.data)

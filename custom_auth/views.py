@@ -56,7 +56,7 @@ class Create(generics.GenericAPIView):
 
 class Refresh(APIView):
     """
-    Refresh of access token
+    Refresh the access token
     returns new access token in body
     """
     permission_classes = []
@@ -81,7 +81,7 @@ class Verify(APIView):
     def post(self, request, *args, **kwargs):
         access = request.POST['access']
         try:
-            refresh = AccessToken(access)
+            AccessToken(access)
         except TokenError:
             return Response({'error': "Invalid access token"}, status=400)
 
@@ -151,9 +151,11 @@ class GroupTokenCreate(generics.ListCreateAPIView):
     queryset = GroupToken.objects.all()
     serializer_class = GroupTokenSerializer
     permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
+    lookup_field = 'username'
 
     def get_queryset(self):
-        self.queryset = self.queryset.filter(group=get_group(self.request))
+        group = Group.objects.get(name=get_group(self.request))
+        self.queryset = self.queryset.filter(group=group.id)
         return self.queryset
 
     def create(self, request, *args, **kwargs):
