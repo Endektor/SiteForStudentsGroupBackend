@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 import string
 import random
 import datetime
 import copy
+import base64
 
 
 class User(AbstractUser):
@@ -42,8 +44,7 @@ class GroupToken(models.Model):
 
     def save(self, *args, **kwargs):
         letters = string.ascii_letters + string.digits
-        date = str(datetime.date.today()).replace('-', '')
-        self.token = ''.join(random.choices(letters, k=20)) + date
+        today = datetime.datetime.today().strftime("%Y-%m-%d-%H.%M.%S")
+        today_base64 = base64.b64encode(today.encode()).decode().replace('=', '')
+        self.token = ''.join(random.choices(letters, k=10)) + today_base64
         super(GroupToken, self).save(*args, **kwargs)
-
-

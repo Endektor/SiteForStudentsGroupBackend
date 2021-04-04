@@ -13,7 +13,7 @@ from datetime import timedelta
 
 from .models import Group, GroupToken
 from .serializers import *
-from .permissions import IsGroupAdmin
+from .permissions import IsGroupAdmin, get_group
 
 username = openapi.Schema(title='username', type='string')
 password = openapi.Schema(title='password', type='string')
@@ -65,7 +65,6 @@ class Refresh(APIView):
         refresh_old = request.COOKIES.get('refresh', None)
         try:
             refresh = RefreshToken(refresh_old)
-            print(refresh.get('username'))
         except TokenError:
             return Response({'error': "Invalid refresh token"}, status=400)
 
@@ -95,16 +94,15 @@ class GroupListCreateAPIView(generics.ListCreateAPIView):
     Modified ListCreateAPIView for groups
     sorts all models by group and automatically adds group to models while creation
     """
-    def get_group(self):
-        group = self.request.GET.get('group', None)
-        group = Group.objects.get(name=group)   # It cant throw an exception because it has been checked in permissions
+    def get_group_obj(self):
+        group = Group.objects.get(name=get_group(self.request))
         return group
 
     def get_queryset(self):
-        self.queryset = self.queryset.filter(group=self.get_group())
+        self.queryset = self.queryset.filter(group=self.get_group_obj())
 
     def perform_create(self, serializer):
-        serializer.save(group=self.get_group())
+        serializer.save(group=self.get_group_obj())
 
 
 class GroupCreate(generics.ListCreateAPIView):
@@ -122,9 +120,9 @@ class GroupCreate(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data.update({'users': request.user.id})
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        group = self.perform_create(serializer)
+        serializer_group = self.get_serializer(data=data)
+        serializer_group.is_valid(raise_exception=True)
+        group = serializer_group.save()
 
         serializer_role = GroupPermissionSerializer(data={'group': group.id,
                                                           'user': request.user.id,
@@ -132,8 +130,8 @@ class GroupCreate(generics.ListCreateAPIView):
         serializer_role.is_valid(raise_exception=True)
         serializer_role.save()
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        headers = self.get_success_headers(serializer_group.data)
+        return Response(serializer_group.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -155,38 +153,49 @@ class GroupTokenCreate(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
 
     def get_queryset(self):
-        self.queryset = self.queryset.filter(group=self.request.GET.get('group', None))
+        self.queryset = self.queryset.filter(group=get_group(self.request))
         return self.queryset
 
     def create(self, request, *args, **kwargs):
         role = request.POST.get('role', None)
-        group = request.GET.get('group', None)
-        group = Group.objects.get(name=group)
+        group = Group.objects.get(name=get_group(request))
         if role not in ('redactor', 'user'):
             return Response({'error': "Select a valid role"}, status=400)
 
         token = GroupTokenSerializer(data={'role': role, 'group': group.id})
         token.is_valid(raise_exception=True)
         token.save()
-        host = request.META['HTTP_HOST']
+        host = request.META.get('HTTP_HOST', 'localhost:8000')
         token_dict = dict(token.data)
         token_dict['token_url'] = 'http://' + host + '/api/auth/token/?token=' + token_dict['token']
         return Response(token_dict, status=200)
 
 
 class TokenAppliance(generics.GenericAPIView):
-    def get(self, request, *args, **kwargs):
-        token = request.GET.get('token', None)
+    """
+    Adds user to group if token is valid
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_token(self):
+        token = self.request.GET.get('token', None)
         if not token:
-            return Response({'error': "No token provided"}, status=400)
+            return Response({'error': "No token provided"}, status=400), True
+
         try:
             token = GroupToken.objects.get(token=token)
         except GroupToken.DoesNotExist:
-            return Response({'error': "Token does not exist or is invalid"}, status=400)
+            return Response({'error': "Token does not exist or is invalid"}, status=400), True
 
         if timezone.now() - token.creation_time >= timedelta(days=7):
             token.delete()
-            return Response({'error': "Token does not exist or is invalid"}, status=400)
+            return Response({'error': "Token does not exist or is invalid"}, status=400), True
+        return token, False
+
+    def get(self, request, *args, **kwargs):
+        token, error = self.get_token()
+        if error:
+            return token
 
         role_obj, created = GroupPermission.objects.get_or_create(group=token.group,
                                                                   user=request.user,

@@ -17,17 +17,17 @@ class IsGroupMember(permissions.BasePermission):
     """
     Check if user is in group
     """
-    message = 'Вы не состоите в данной группе'
+    message = 'You are not group member'
 
     def has_permission(self, request, view):
-        group = request.GET.get('group', None)
+        group = get_group(request)
         if not group:
-            self.message = 'Не была предоставлена группа'
+            self.message = 'Group has not been provided'
             return False
         try:
             group = Group.objects.get(name=group)
         except Group.DoesNotExist:
-            self.message = 'Данной группы не существует'
+            self.message = 'Group does not exist'
             return False
 
         return group in request.user.users_in_group.all()
@@ -46,13 +46,13 @@ class IsGroupRole(IsGroupMember):
     Check if user has a role in group
     """
     role = None
+    message = 'User does not have the required role'
 
     def has_permission(self, request, view):
         success = super(IsGroupRole, self).has_permission(request, view)
         if not success:
             return False
-        group = request.GET.get('group', None)
-        group = Group.objects.get(name=group)
+        group = Group.objects.get(name=get_group(request))
         return request.user.user_permission.get(group=group.id).role == self.role
 
 
@@ -62,3 +62,10 @@ class IsGroupAdmin(IsGroupRole):
 
 class IsGroupRedactor(IsGroupRole):
     role = 'redactor'
+
+
+def get_group(request):
+    """
+    Returns group from query parameters or from body
+    """
+    return request.GET.get('group', request.POST.get('group', None))

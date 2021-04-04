@@ -1,7 +1,5 @@
 from rest_framework.utils import json
 
-from icecream import ic
-
 from .models import Group, GroupPermission, User
 from .serializers import *
 from rest_framework import status
@@ -9,9 +7,9 @@ from rest_framework.test import APITestCase
 
 
 def print_decorator(func):
-    def wrapper(self):
+    def wrapper(self, *args, **kwargs):
         print('Test: {}'.format(func.__name__), end='')
-        func(self)
+        func(self, *args, **kwargs)
         print(' OK')
     return wrapper
 
@@ -22,14 +20,14 @@ class CustomAuthApiTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access)
 
     @print_decorator
-    def user_create(self, name):
+    def user_create(self, name, id):
         url = '/api/auth/users/'
         response = self.client.post(url, {'username': name,
                                           'password': 'Alpine12'})
         expected_data = {
             'email': '',
-            'username': 'test_name',
-            'id': 1
+            'username': name,
+            'id': id
         }
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expected_data, response.data)
@@ -38,7 +36,7 @@ class CustomAuthApiTest(APITestCase):
         user.save()
 
     @print_decorator
-    def token_create(self):
+    def login(self):
         url = '/api/auth/jwt/create/'
         response = self.client.post(url, {'username': 'test_name',
                                           'password': 'Alpine12'})
@@ -107,7 +105,8 @@ class CustomAuthApiTest(APITestCase):
                 'role': role,
                 'group': 1,
                 'creation_time': response.data['creation_time'],
-                'token': response.data['token']
+                'token': response.data['token'],
+                'token_url': 'http://localhost:8000/api/auth/token/?token=' + response.data['token']
             }
             self.assertEqual(status.HTTP_200_OK, response.status_code)
             self.assertEqual(expected_data, response.data)
@@ -119,14 +118,14 @@ class CustomAuthApiTest(APITestCase):
         pass
 
     def test_api(self):
-        self.user_create('test_name')
-        self.token_create()
+        self.user_create('test_name', 1)
+        self.login()
         self.group_create()
         self.get_user_groups()
         self.get_group_users()
         self.group_token_create()
 
-        self.user_create('test_name2')
+        self.user_create('test_name2', 2)
         self.join_to_group()
 
     #     # group_1 = Group.objects.create(name='test1')
