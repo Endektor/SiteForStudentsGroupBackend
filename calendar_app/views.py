@@ -3,8 +3,7 @@ from rest_framework import generics, permissions
 
 from .models import Day, Info, Event
 from .serializers import *
-from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup, IsAdmin, IsRedactor
-from custom_auth.models import Group
+from custom_auth.permissions import IsGroupRedactorOrReadOnly
 from custom_auth.views import GroupListCreateAPIView
 
 
@@ -14,7 +13,7 @@ class Daylist(GroupListCreateAPIView):
     """
     queryset = Day.objects.all()
     serializer_class = DaySerializer
-    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
+    permission_classes = [permissions.IsAuthenticated, IsGroupRedactorOrReadOnly]
 
     def get_queryset(self):
         super(Daylist, self).get_queryset()
@@ -31,7 +30,7 @@ class DayDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
     lookup_field = 0
-    permission_classes = [permissions.IsAuthenticated, IsGroupMember, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsGroupRedactorOrReadOnly]
 
     def get_object(self):
         queryset = self.get_queryset()
@@ -48,7 +47,7 @@ class Infolist(GroupListCreateAPIView):
     """
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
-    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
+    permission_classes = [permissions.IsAuthenticated, IsGroupRedactorOrReadOnly]
 
 
 class InfoDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -58,4 +57,4 @@ class InfoDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
     lookup_field = 'id'
-    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
+    permission_classes = [permissions.IsAuthenticated, IsGroupRedactorOrReadOnly]

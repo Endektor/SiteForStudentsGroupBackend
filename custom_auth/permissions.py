@@ -4,7 +4,7 @@ from .models import Group
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
-    Allows to read for everyone and allows to change only for admin
+    Allows to read for everyone and allows to change only for owner
     """
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
@@ -33,17 +33,9 @@ class IsGroupMember(permissions.BasePermission):
         return group in request.user.users_in_group.all()
 
 
-class IsObjectInUsersGroup(permissions.BasePermission):
-    """
-    Check if object is in user's group
-    """
-    def has_object_permission(self, request, view, obj):
-        return obj.group in request.user.users_in_group
-
-
 class IsGroupRedactor(IsGroupMember):
     """
-    Checks if user has redactor or admin role in group
+    Checks if user is admin or redactor of group
     """
     role = ('admin', 'redactor')
     message = 'User does not have the required role'
@@ -58,7 +50,24 @@ class IsGroupRedactor(IsGroupMember):
 
 class IsGroupAdmin(IsGroupRedactor):
     """
-    Checks if user has admin role in group
+    The same as IsGroupRedactorOrReadOnly, but only for admin
+    """
+    role = ('admin',)
+
+
+class IsGroupRedactorOrReadOnly(IsGroupRedactor):
+    """
+    Allows to read for member of group and to change for redactor and admin
+    """
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return super(IsGroupRedactorOrReadOnly, self).has_permission(request, view)
+
+
+class IsGroupAdminOrReadOnly(IsGroupRedactorOrReadOnly):
+    """
+    The same as IsGroupRedactorOrReadOnly, but only for admin
     """
     role = ('admin',)
 

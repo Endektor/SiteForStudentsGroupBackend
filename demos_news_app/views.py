@@ -1,10 +1,9 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import permissions, generics
 
-from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup, get_group
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsGroupAdminOrReadOnly, get_group
 from custom_auth.models import Group
 from custom_auth.views import GroupListCreateAPIView
-from rest_framework.response import Response
 
 from .models import Post, Tag
 from .serializers import *
@@ -55,7 +54,9 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     lookup_field = 'id'
-    permission_classes = [permissions.IsAuthenticated, IsGroupMember, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated,
+                          IsGroupMember,
+                          IsOwnerOrReadOnly | IsGroupAdminOrReadOnly]
 
     def put(self, request, *args, **kwargs):
         tags = request.POST.get('tags', None)
@@ -84,4 +85,6 @@ class TagDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     lookup_field = 'id'
-    permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated, IsGroupMember]
+    permission_classes = [permissions.IsAuthenticated,
+                          IsGroupMember,
+                          IsOwnerOrReadOnly | IsGroupAdminOrReadOnly]

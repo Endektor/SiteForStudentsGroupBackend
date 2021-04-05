@@ -13,7 +13,7 @@ from datetime import timedelta
 
 from .models import Group, GroupToken
 from .serializers import *
-from .permissions import IsGroupAdmin, get_group
+from .permissions import IsGroupAdmin, IsGroupAdminOrReadOnly, get_group
 
 username = openapi.Schema(title='username', type='string')
 password = openapi.Schema(title='password', type='string')
@@ -147,7 +147,7 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Group.objects.all()
     serializer_class = GetGroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
     lookup_field = 'name'
 
 
@@ -157,7 +157,7 @@ class GroupTokenCreate(generics.ListCreateAPIView):
     """
     queryset = GroupToken.objects.all()
     serializer_class = GroupTokenSerializer
-    permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsGroupAdminOrReadOnly]
     lookup_field = 'username'
 
     def get_queryset(self):
