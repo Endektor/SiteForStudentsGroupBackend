@@ -3,18 +3,21 @@ from rest_framework import generics, permissions
 
 from .models import Day, Info, Event
 from .serializers import *
-from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup, IsAdmin, IsRedactor
 from custom_auth.models import Group
 from custom_auth.views import GroupListCreateAPIView
 
 
-class Dayslist(GroupListCreateAPIView):
+class Daylist(GroupListCreateAPIView):
+    """
+    List of posts or post creation
+    """
     queryset = Day.objects.all()
     serializer_class = DaySerializer
     permission_classes = [permissions.IsAuthenticated, IsGroupMember]
 
     def get_queryset(self):
-        super(Dayslist, self).get_queryset()
+        super(Daylist, self).get_queryset()
         year = self.kwargs.get('year', 0)
         month = self.kwargs.get('month', 0)
         self.queryset = self.queryset.filter(date__year=year, date__month=month)
@@ -22,6 +25,9 @@ class Dayslist(GroupListCreateAPIView):
 
 
 class DayDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Operations with concrete post
+    """
     queryset = Day.objects.all()
     serializer_class = DaySerializer
     lookup_field = 0
@@ -37,12 +43,19 @@ class DayDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class Infolist(GroupListCreateAPIView):
+    """
+    List of posts or post creation
+    """
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
     permission_classes = [permissions.IsAuthenticated, IsGroupMember]
 
-# class TagDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Tag.objects.all()
-#     serializer_class = TagSerializer
-#     lookup_field = 'id'
-#     permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated]
+
+class InfoDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Operations with concrete post
+    """
+    queryset = Info.objects.all()
+    serializer_class = InfoSerializer
+    lookup_field = 'id'
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember]

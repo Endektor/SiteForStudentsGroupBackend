@@ -21,19 +21,19 @@ class CustomAuthApiTest(APITestCase):
     """
 
     def test_api(self):
-        self.user_create('test_name', 1)
-        self.login('test_name')
+        self.user_create(username='test_name', id=1)
+        self.login(username='test_name')
         self.group_create()
         self.get_user_groups()
         self.get_group_users()
-        self.group_token_create('user', 1)
-        self.group_token_create('redactor', 2)
+        self.group_token_create(role='user', expected_id=1)
+        self.group_token_create(role='redactor', expected_id=2)
         tokens = self.get_group_tokens()
 
-        self.user_create('test_name2', 2)
-        self.login('test_name2')
-        self.join_to_group(tokens[0], 'user')
-        self.join_to_group(tokens[1], 'redactor')
+        self.user_create(username='test_name2', id=2)
+        self.login(username='test_name2')
+        self.join_to_group(token=tokens[0], role='user')
+        self.join_to_group(token=tokens[1], role='redactor')
 
     @print_decorator
     def user_create(self, username, id):

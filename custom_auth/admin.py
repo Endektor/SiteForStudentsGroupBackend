@@ -14,13 +14,7 @@ class GroupAdmin(admin.ModelAdmin):
     ]
 
 
-class GroupTokenAdmin(admin.ModelAdmin):
-    # list_display = ('creation_time',)
-    pass
-    # exclude = ['token']
-
-
 admin.site.register(Group, GroupAdmin)
 admin.site.register(GroupPermission)
 admin.site.register(User, UserAdmin)
-admin.site.register(GroupToken, GroupTokenAdmin)
+admin.site.register(GroupToken)

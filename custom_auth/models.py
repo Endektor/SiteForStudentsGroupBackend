@@ -10,8 +10,6 @@ import base64
 
 class User(AbstractUser):
     pass
-    # class Meta:
-    #     ref_name="test"
 
 
 class Group(models.Model):

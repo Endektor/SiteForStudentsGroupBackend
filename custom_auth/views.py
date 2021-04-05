@@ -53,7 +53,7 @@ class Create(generics.GenericAPIView):
         return response
 
 
-class Refresh(APIView):
+class Refresh(generics.GenericAPIView):
     """
     Refresh the access token
     returns new access token in body
@@ -79,7 +79,7 @@ class Refresh(APIView):
         return response
 
 
-class Verify(APIView):
+class Verify(generics.GenericAPIView):
     """
     Verification of access token
     """
@@ -100,15 +100,16 @@ class GroupListCreateAPIView(generics.ListCreateAPIView):
     Modified ListCreateAPIView for groups
     sorts all models by group and automatically adds group to models while creation
     """
-    def get_group_obj(self):
+    def get_group_id(self):
         group = Group.objects.get(name=get_group(self.request))
-        return group
+        return group.id
 
     def get_queryset(self):
-        self.queryset = self.queryset.filter(group=self.get_group_obj())
+        self.queryset = self.queryset.filter(group=self.get_group_id())
+        return self.queryset
 
     def perform_create(self, serializer):
-        serializer.save(group=self.get_group_obj())
+        serializer.save(group=self.get_group_id())
 
 
 class GroupCreate(generics.ListCreateAPIView):

@@ -2,11 +2,6 @@ from django.contrib import admin
 from .models import Post, Tag
 
 
-# class TagInline(admin.TabularInline):
-#     model = Tag
-#     extra = 0
-
-
 class TagInline(admin.TabularInline):
     model = Tag.post.through
     extra = 0

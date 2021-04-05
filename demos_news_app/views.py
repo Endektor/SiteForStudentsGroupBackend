@@ -1,7 +1,7 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import permissions, generics
 
-from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup, get_group
 from custom_auth.models import Group
 from custom_auth.views import GroupListCreateAPIView
 from rest_framework.response import Response
@@ -11,10 +11,13 @@ from .serializers import *
 
 
 class LocalPagination(PageNumberPagination):
-    page_size = 5
+    page_size = 10
 
 
 class PostList(GroupListCreateAPIView):
+    """
+    List of posts or post creation
+    """
     queryset = Post.objects.all().order_by('date')
     serializer_class = PostSerializer
     pagination_class = LocalPagination
@@ -34,9 +37,9 @@ class PostList(GroupListCreateAPIView):
             return self.queryset
 
     def perform_create(self, serializer):
-        tags = self.request.data.get('tags', None)
-        group = self.request.data.get('group')
-        group = Group.objects.get(name=group)   # It cant throw an exception because it has been checked in permissions
+        tags = self.request.POST.get('tags', None)
+        group = get_group(self.request)
+        group = Group.objects.get(name=group)
         if tags:
             tags = list(map(int, tags.split(',')))
             tags = Tag.objects.filter(id__in=tags)
@@ -46,13 +49,16 @@ class PostList(GroupListCreateAPIView):
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Operations with concrete post
+    """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     lookup_field = 'id'
     permission_classes = [permissions.IsAuthenticated, IsGroupMember, IsOwnerOrReadOnly]
 
     def put(self, request, *args, **kwargs):
-        tags = request.data.get('tags', None)
+        tags = request.POST.get('tags', None)
         if tags:
             tags = list(map(int, tags.split(',')))
             post = Post.objects.get(id=kwargs.get('id'))
@@ -63,12 +69,18 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class TagList(GroupListCreateAPIView):
+    """
+    List of posts or post creation
+    """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [permissions.IsAuthenticated, IsGroupMember]
 
 
 class TagDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Operations with concrete tag
+    """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     lookup_field = 'id'

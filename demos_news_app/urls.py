@@ -1,10 +1,11 @@
 from django.conf.urls import url
 
-from demos_news_app import views as demos_news_views
+from .views import *
 
 urlpatterns = [
-    url('posts/$', demos_news_views.PostList.as_view()),
-    url(r'posts/(?P<id>[0-9]+)$', demos_news_views.PostDetail.as_view()),
-    url('tags/$', demos_news_views.TagList.as_view()),
-    url(r'tags/(?P<id>[0-9]+)$', demos_news_views.TagDetail.as_view()),
+    url(r'^posts/$', PostList.as_view()),
+    url(r'^posts/(?P<id>[0-9]+)$', PostDetail.as_view()),
+
+    url(r'^tags/$', TagList.as_view()),
+    url(r'^tags/(?P<id>[0-9]+)$', TagDetail.as_view()),
 ]

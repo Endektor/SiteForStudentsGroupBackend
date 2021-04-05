@@ -7,13 +7,13 @@ from django.conf.urls import url
 from .views import *
 
 urlpatterns = [
-    url('jwt/create/$', Create.as_view()),
-    url('jwt/refresh/$', Refresh.as_view()),
-    url('jwt/verify/$', Verify.as_view()),
+    url(r'^jwt/create/$', Create.as_view()),
+    url(r'^jwt/refresh/$', Refresh.as_view()),
+    url(r'^jwt/verify/$', Verify.as_view()),
 
-    url(r'group/$', GroupCreate.as_view()),
-    url(r'group/(?P<name>[a-zA-Z0-9_]+)$', GroupDetail.as_view()),
+    url(r'^group/$', GroupCreate.as_view()),
+    url(r'^group/(?P<name>[a-zA-Z0-9_]+)$', GroupDetail.as_view()),
 
-    url(r'token/appliance/$', TokenAppliance.as_view()),
-    url(r'token/$', GroupTokenCreate.as_view()),
+    url(r'^token/appliance/$', TokenAppliance.as_view()),
+    url(r'^token/$', GroupTokenCreate.as_view()),
 ]

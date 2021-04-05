@@ -41,27 +41,26 @@ class IsObjectInUsersGroup(permissions.BasePermission):
         return obj.group in request.user.users_in_group
 
 
-class IsGroupRole(IsGroupMember):
+class IsGroupRedactor(IsGroupMember):
     """
-    Check if user has a role in group
+    Checks if user has redactor or admin role in group
     """
-    role = None
+    role = ('admin', 'redactor')
     message = 'User does not have the required role'
 
     def has_permission(self, request, view):
-        success = super(IsGroupRole, self).has_permission(request, view)
+        success = super(IsGroupRedactor, self).has_permission(request, view)
         if not success:
             return False
         group = Group.objects.get(name=get_group(request))
-        return request.user.user_permission.get(group=group.id).role == self.role
+        return request.user.user_permission.get(group=group.id).role in self.role
 
 
-class IsGroupAdmin(IsGroupRole):
-    role = 'admin'
-
-
-class IsGroupRedactor(IsGroupRole):
-    role = 'redactor'
+class IsGroupAdmin(IsGroupRedactor):
+    """
+    Checks if user has admin role in group
+    """
+    role = ('admin',)
 
 
 def get_group(request):

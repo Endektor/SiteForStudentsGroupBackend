@@ -6,6 +6,9 @@ from custom_auth.serializers import UserSerializer
 
 
 class UserPostsSerializer(UserSerializer):
+    """
+    Serializer for getting user's posts
+    """
     posts = serializers.PrimaryKeyRelatedField(many=True, queryset=Post.objects.all())
 
     class Meta:
@@ -15,12 +18,18 @@ class UserPostsSerializer(UserSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """
+    Serializer for getting tags
+    """
     class Meta:
         model = Tag
         fields = ('id', 'name')
 
 
 class PostSerializer(serializers.ModelSerializer):
+    """
+    Serializer for getting post
+    """
     author = UserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
 

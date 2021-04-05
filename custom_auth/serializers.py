@@ -55,6 +55,3 @@ class GroupTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupToken
         fields = ('id', 'role', 'group', 'creation_time', 'token')
-
-
-
