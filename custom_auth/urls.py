@@ -11,8 +11,8 @@ urlpatterns = [
     url(r'^jwt/refresh/$', Refresh.as_view()),
     url(r'^jwt/verify/$', Verify.as_view()),
 
-    url(r'^group/$', GroupCreate.as_view()),
-    url(r'^group/(?P<name>[a-zA-Z0-9_]+)$', GroupDetail.as_view()),
+    url(r'^groups/$', GroupCreate.as_view()),
+    url(r'^group/$', GroupDetail.as_view()),
 
     url(r'^token/appliance/$', TokenAppliance.as_view()),
     url(r'^token/$', GroupTokenCreate.as_view()),

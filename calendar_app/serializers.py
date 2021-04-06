@@ -9,7 +9,6 @@ class InfoSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    event_info = InfoSerializer(read_only=True)
 
     class Meta:
         model = Event

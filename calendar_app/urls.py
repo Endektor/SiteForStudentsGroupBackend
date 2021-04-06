@@ -4,8 +4,12 @@ from .views import *
 
 
 urlpatterns = [
-    url(r'^days/(?P<year>[0-9]{4})(?P<month>[0-9]{2})$', Daylist.as_view()),
-    url(r'^days/(?P<year>[0-9]{4})(?P<month>[0-9]{2})(?P<day>[0-9]{2})$', DayDetail.as_view()),
+    url(r'^days/$', DayList.as_view()),
+    url(r'^day/$', DayDetail.as_view()),
 
-    url(r'^info/$', Infolist.as_view()),
+    url(r'^events/$', EventList.as_view()),
+    url(r'^event/$', EventDetail.as_view()),
+
+    url(r'^infos/$', InfoList.as_view()),
+    url(r'^info/$', InfoDetail.as_view()),
 ]

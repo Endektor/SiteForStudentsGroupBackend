@@ -100,16 +100,20 @@ class GroupListCreateAPIView(generics.ListCreateAPIView):
     Modified ListCreateAPIView for groups
     sorts all models by group and automatically adds group to models while creation
     """
-    def get_group_id(self):
-        group = Group.objects.get(name=get_group(self.request))
-        return group.id
+
+    def get_group_name(self):
+        return self.request.GET.get('group', self.request.POST.get('group', None))
+
+    def get_group_obj(self):
+        group = Group.objects.get(name=self.get_group_name())
+        return group
 
     def get_queryset(self):
-        self.queryset = self.queryset.filter(group=self.get_group_id())
+        self.queryset = self.queryset.filter(group=self.get_group_obj().id)
         return self.queryset
 
     def perform_create(self, serializer):
-        serializer.save(group=self.get_group_id())
+        serializer.save(group=self.get_group_obj())
 
 
 class GroupCreate(generics.ListCreateAPIView):
@@ -148,7 +152,16 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Group.objects.all()
     serializer_class = GetGroupSerializer
     permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
-    lookup_field = 'name'
+
+    def get_object(self):
+        name = self.request.GET.get('group', None)
+        if not name:
+            return Response({'error': "Select a valid group"}, status=400)
+        try:
+            obj = self.queryset.get(name=name)
+        except Group.DoesNotExist:
+            return Response({'error': "Group does not exist or is invalid"}, status=400)
+        return obj
 
 
 class GroupTokenCreate(generics.ListCreateAPIView):

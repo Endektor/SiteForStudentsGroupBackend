@@ -1,18 +1,9 @@
 from rest_framework.utils import json
 
-from .models import Group, GroupPermission, User
+from .models import User
 from .serializers import *
 from rest_framework import status
 from rest_framework.test import APITestCase
-
-
-def print_decorator(func):
-    def wrapper(self, *args, **kwargs):
-        print('Test: {}'.format(func.__name__), end='')
-        data = func(self, *args, **kwargs)
-        print(' OK')
-        return data
-    return wrapper
 
 
 class CustomAuthApiTest(APITestCase):
@@ -35,7 +26,6 @@ class CustomAuthApiTest(APITestCase):
         self.join_to_group(token=tokens[0], role='user')
         self.join_to_group(token=tokens[1], role='redactor')
 
-    @print_decorator
     def user_create(self, username, id):
         url = '/api/auth/users/'
         response = self.client.post(url, {'username': username,
@@ -51,7 +41,6 @@ class CustomAuthApiTest(APITestCase):
         user.is_active = True
         user.save()
 
-    @print_decorator
     def login(self, username):
         url = '/api/auth/jwt/create/'
         response = self.client.post(url, {'username': username,
@@ -59,9 +48,8 @@ class CustomAuthApiTest(APITestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
 
-    @print_decorator
     def group_create(self):
-        url = '/api/auth/group/'
+        url = '/api/auth/groups/'
         response = self.client.post(url, {'name': 'group_name'})
         expected_data = {
             "id": 1,
@@ -73,9 +61,8 @@ class CustomAuthApiTest(APITestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expected_data, response.data)
 
-    @print_decorator
     def get_user_groups(self):
-        url = '/api/auth/group/'
+        url = '/api/auth/groups/'
         response = self.client.get(url)
         expected_data = [
             {
@@ -89,9 +76,8 @@ class CustomAuthApiTest(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(expected_data, response.data)
 
-    @print_decorator
     def get_group_users(self):
-        url = '/api/auth/group/group_name'
+        url = r'/api/auth/group/?group=group_name'
         response = self.client.get(url)
         expected_data = {
             "id": 1,
@@ -106,7 +92,6 @@ class CustomAuthApiTest(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(expected_data, response.data)
 
-    @print_decorator
     def group_token_create(self, role, expected_id):
         url = '/api/auth/token/?group=group_name'
         response = self.client.post(url, {'role': role})
@@ -121,7 +106,6 @@ class CustomAuthApiTest(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(expected_data, response.data)
 
-    @print_decorator
     def get_group_tokens(self):
         url = '/api/auth/token/?group=group_name'
         response = self.client.get(url)
@@ -140,7 +124,6 @@ class CustomAuthApiTest(APITestCase):
         tokens = [response.data[0]['token'], response.data[1]['token']]
         return tokens
 
-    @print_decorator
     def join_to_group(self, token, role):
         url = '/api/auth/token/appliance/?token=' + token
         response = self.client.get(url)

@@ -6,7 +6,7 @@ from rest_framework import generics, permissions
 from .models import Letter
 from .serializers import *
 from .mail_service import Service
-from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsObjectInUsersGroup
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember
 from custom_auth.models import Group
 from custom_auth.views import GroupListCreateAPIView
 
