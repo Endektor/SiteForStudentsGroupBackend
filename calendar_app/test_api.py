@@ -1,8 +1,5 @@
 from custom_auth.test_api import CustomAuthApiTest
-# from ..serializers import DaySerializer, EventSerializer, InfoSerializer
-# from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 
 class CalendarApiTest(CustomAuthApiTest):
