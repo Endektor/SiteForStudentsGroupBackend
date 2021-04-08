@@ -32,7 +32,7 @@ urlpatterns = [
 
     url(r'^api/calendar/', include('calendar_app.urls')),
 
-    url(r'^api/letters/', include('mail_app.urls')),
+    url(r'^api/mail/', include('mail_app.urls')),
 
     url(r'^api/demosnews/', include('demos_news_app.urls')),
 

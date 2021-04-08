@@ -1,4 +1,6 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.files.storage import FileSystemStorage
+from django.core.validators import validate_unicode_slug
 from django.db import models
 
 import string
@@ -13,12 +15,22 @@ class User(AbstractUser):
 
 
 class Group(models.Model):
-    name = models.CharField(unique=True, max_length=128)
+    name = models.CharField(unique=True, max_length=128, validators=[validate_unicode_slug])
     users = models.ManyToManyField(User, related_name='users_in_group', through='GroupPermission')
 
     def __str__(self):
         return self.name
 
+    def delete(self, using=None, keep_parents=False):
+        folder = 'mail_app/group_files/' + self.name + '/'
+        fs = FileSystemStorage(location=folder)
+        if fs.exists('credentials.json'):
+            fs.delete('credentials.json')
+        if fs.exists('token.json'):
+            fs.delete('token.json')
+        if fs.exists('mail_data.json'):
+            fs.delete('mail_data.json')
+        super(Group, self).delete()
 
 ROLES = [
     ('redactor', 'redactor'),

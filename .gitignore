@@ -9,3 +9,4 @@ credentials.json
 debug.log
 .env
 mail_app/mail_data.json
+mail_app/group_files
