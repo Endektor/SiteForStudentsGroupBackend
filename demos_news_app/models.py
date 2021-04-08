@@ -9,7 +9,7 @@ class Post(models.Model):
     title = models.CharField(max_length=128)
     text = models.TextField(blank=True)
     date = models.DateTimeField(unique=True, default=timezone.now)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_posts')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_post')
 
     def __str__(self):
@@ -18,7 +18,7 @@ class Post(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=128, unique=True)
-    post = models.ManyToManyField(Post, related_name='tags')
+    post = models.ManyToManyField(Post, related_name='post_tags')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_tag')
 
     def __str__(self):

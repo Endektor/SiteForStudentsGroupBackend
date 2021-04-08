@@ -61,7 +61,7 @@ class Service:
                     letter.downloadAttachment(file, downloadFolder='media/mail_attachments/' + group.name + '/')
                     attachment = Attachment(group=group)
                     attachment.file.name = 'media/mail_attachments/' + group.name + '/' + file
-                    attachment.letter = letter_obj
+                    attachment.letter_attachment = letter_obj
                     attachment.save()
 
         with open(folder + '/mail_data.json', 'wb') as data_file:

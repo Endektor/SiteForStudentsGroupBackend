@@ -8,6 +8,7 @@ import random
 import datetime
 import copy
 import base64
+import os
 
 
 class User(AbstractUser):
@@ -22,15 +23,9 @@ class Group(models.Model):
         return self.name
 
     def delete(self, using=None, keep_parents=False):
-        folder = 'mail_app/group_files/' + self.name + '/'
-        fs = FileSystemStorage(location=folder)
-        if fs.exists('credentials.json'):
-            fs.delete('credentials.json')
-        if fs.exists('token.json'):
-            fs.delete('token.json')
-        if fs.exists('mail_data.json'):
-            fs.delete('mail_data.json')
+        os.remove('mail_app/group_files/' + self.name + '/')
         super(Group, self).delete()
+
 
 ROLES = [
     ('redactor', 'redactor'),

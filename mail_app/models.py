@@ -15,5 +15,5 @@ class Letter(models.Model):
 
 class Attachment(models.Model):
     file = models.FileField(upload_to='mail_attachments/')
-    letter = models.ForeignKey('Letter', on_delete=models.CASCADE, null=True, related_name='letter')
+    letter = models.ForeignKey('Letter', on_delete=models.CASCADE, null=True, related_name='letter_attachment')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_attachment')

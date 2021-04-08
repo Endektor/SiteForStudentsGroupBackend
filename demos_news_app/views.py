@@ -29,7 +29,7 @@ class PostList(GroupListCreateAPIView):
         try:
             tags = tags.split(',')
             tags = list(map(int, tags))
-            self.queryset = self.queryset.filter(tag__in=tags)
+            self.queryset = self.queryset.filter(post_tags__in=tags)
             return self.queryset
 
         except (ValueError, AttributeError):
@@ -42,9 +42,9 @@ class PostList(GroupListCreateAPIView):
         if tags:
             tags = list(map(int, tags.split(',')))
             tags = Tag.objects.filter(id__in=tags)
-            serializer.save(author=self.request.user, group=group, tags=tags)
+            serializer.save(user=self.request.user, group=group, post_tags=tags)
         else:
-            serializer.save(author=self.request.user, group=group)
+            serializer.save(user=self.request.user, group=group)
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):

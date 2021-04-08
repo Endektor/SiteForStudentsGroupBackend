@@ -13,15 +13,11 @@ class Day(models.Model):
     def __str__(self):
         return f'{str(self.date.day)}/{str(self.date.month)}/{str(self.date.year)}'
 
-    class Meta:
-        verbose_name = 'День'
-        verbose_name_plural = 'Дни'
-
 
 class Event(models.Model):
     description = models.TextField(blank=True)
-    day = models.ForeignKey(Day, null=True, on_delete=models.CASCADE, related_name='event')
-    event_info = models.ForeignKey('Info', null=True, on_delete=models.SET_NULL, related_name='event_info')
+    day = models.ForeignKey('Day', null=True, on_delete=models.CASCADE, related_name='day_event')
+    info = models.ForeignKey('Info', null=True, on_delete=models.SET_NULL, related_name='info_event')
     time = models.TimeField(default=timezone.now)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_event')
 

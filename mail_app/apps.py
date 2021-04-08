@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-from django.core.files.storage import FileSystemStorage
 
 import datetime
 import os
@@ -25,7 +24,7 @@ class MailAppConfig(AppConfig):
         Outdated method for mail check. Celery is used instead now.
         But it can be used for mail Service debug (if mail_for_debug = True)
         """
-        mail_for_debug = True
+        mail_for_debug = False
         if os.environ.get('RUN_MAIN', None) != 'true' and \
                 not os.environ.get('Mail_env', None) == 'true' and \
                 mail_for_debug:

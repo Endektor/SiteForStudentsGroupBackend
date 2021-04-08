@@ -9,12 +9,12 @@ class UserPostsSerializer(UserSerializer):
     """
     Serializer for getting user's posts
     """
-    posts = serializers.PrimaryKeyRelatedField(many=True, queryset=Post.objects.all())
+    user_posts = serializers.PrimaryKeyRelatedField(many=True, queryset=Post.objects.all())
 
     class Meta:
         ref_name = 'posts_user'
         model = User
-        fields = ('id', 'username', 'posts')
+        fields = ('id', 'username', 'user_posts')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -30,10 +30,10 @@ class PostSerializer(serializers.ModelSerializer):
     """
     Serializer for getting post
     """
-    author = UserSerializer(read_only=True)
-    tags = TagSerializer(read_only=True, many=True)
+    user = UserSerializer(read_only=True)
+    post_tags = TagSerializer(read_only=True, many=True)
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'text', 'date', 'author', 'tags')
+        fields = ('id', 'title', 'text', 'date', 'user', 'post_tags')
         depth = 1

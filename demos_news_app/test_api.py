@@ -16,14 +16,14 @@ class PostsApiTest(CustomAuthApiTest):
         response = self.client.post(url, {'title': 'test_title1',
                                           'text': 'test_title1',
                                           'date': '2013-01-29T12:34:56.000000Z',
-                                          'author': 1,
+                                          'user': 1,
                                           'group': 'group_name'})
         expected_data = {'id': 1,
                          'title': 'test_title1',
                          'text': 'test_title1',
                          'date': '2013-01-29T16:34:56+04:00',
-                         'author': {'id': 1, 'username': 'name1'},
-                         'tags': []}
+                         'user': {'id': 1, 'username': 'name1'},
+                         'post_tags': []}
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expected_data, response.data)
 

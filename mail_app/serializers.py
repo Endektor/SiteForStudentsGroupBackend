@@ -9,8 +9,8 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 
 class LetterSerializer(serializers.ModelSerializer):
-    letter = AttachmentSerializer(many=True)
+    letter_attachment = AttachmentSerializer(many=True)
 
     class Meta:
         model = Letter
-        fields = ('id', 'mailer', 'topic', 'text', 'letter')
+        fields = ('id', 'mailer', 'topic', 'text', 'letter_attachment')

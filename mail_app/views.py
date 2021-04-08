@@ -9,8 +9,7 @@ from rest_framework.response import Response
 from .models import Letter
 from .serializers import *
 from .mail_service import Service
-from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupMember, IsGroupAdmin
-from custom_auth.models import Group
+from custom_auth.permissions import IsOwnerOrReadOnly, IsGroupRedactorOrReadOnly, IsGroupMember, IsGroupAdmin
 from custom_auth.views import GroupListCreateAPIView
 
 
@@ -25,7 +24,7 @@ class LettersList(GroupListCreateAPIView):
     queryset = Letter.objects.all().order_by('-date_time')
     serializer_class = LetterSerializer
     pagination_class = LocalPagination
-    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
+    permission_classes = [permissions.IsAuthenticated, IsGroupRedactorOrReadOnly]
 
 
 class LetterDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -35,13 +34,15 @@ class LetterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Letter.objects.all()
     serializer_class = LetterSerializer
     lookup_field = 'id'
-    permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsGroupRedactorOrReadOnly]
 
 
 class CheckEmail(GroupListCreateAPIView):
     """
     Checks latest letters on the group's mail
     """
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
+
     def get(self, request, *args, **kwargs):
         group = self.get_group_name()
         service = Service(amount_of_letters=kwargs['amount'], group=group)
@@ -69,7 +70,8 @@ class UploadFiles(GroupListCreateAPIView):
             token = request.FILES['token.json']
         except MultiValueDictKeyError:
             return Response('There is no credentials.json or token.json file', status=400)
+
         fs = FileSystemStorage(location=folder)
         self.save_file(fs, 'credentials.json', credentials)
         self.save_file(fs, 'token.json', token)
-        return Response(1, status=200)
+        return Response('Saved', status=200)

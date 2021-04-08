@@ -17,7 +17,7 @@ class CalendarApiTest(CustomAuthApiTest):
         response = self.client.post(url, {'date': '2020-02-20',
                                           'topic': 'day_test',
                                           'group': 'group_name'})
-        expected_data = {'id': 1, 'date': '2020-02-20', 'topic': 'day_test', 'event': []}
+        expected_data = {'id': 1, 'date': '2020-02-20', 'topic': 'day_test', 'day_event': []}
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expected_data, response.data)
 
@@ -34,13 +34,13 @@ class CalendarApiTest(CustomAuthApiTest):
         url = '/api/calendar/events/'
         response = self.client.post(url, {'description': 'test_description',
                                           'day': 1,
-                                          'event_info': 1,
+                                          'info': 1,
                                           'time': '12:34:56',
                                           'group': 'group_name'})
         expected_data = {'id': 1,
                          'day': 1,
                          'description': 'test_description',
                          'time': '12:34:56',
-                         'event_info': 1}
+                         'info': 1}
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(expected_data, response.data)

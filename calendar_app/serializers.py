@@ -12,12 +12,12 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('id', 'day', 'description', 'time', 'event_info')
+        fields = ('id', 'day', 'description', 'time', 'info')
 
 
 class DaySerializer(serializers.ModelSerializer):
-    event = EventSerializer(many=True, read_only=True)
+    day_event = EventSerializer(many=True, read_only=True)
 
     class Meta:
         model = Day
-        fields = ('id', 'date', 'topic', 'event')
+        fields = ('id', 'date', 'topic', 'day_event')
