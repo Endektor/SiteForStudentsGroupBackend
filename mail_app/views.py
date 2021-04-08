@@ -6,6 +6,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 
+from decouple import config
+import pyAesCrypt
+
 from .models import Letter
 from .serializers import *
 from .mail_service import Service
@@ -57,10 +60,16 @@ class UploadFiles(GroupListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsGroupAdmin]
 
     @staticmethod
-    def save_file(fs, name, file):
+    def save_file(fs, name, file, folder):
         if fs.exists(name):
             fs.delete(name)
         fs.save(name, file)
+
+        buffer_size = 64 * 1024
+        key = config('KEY')
+        file_name = folder + name
+        pyAesCrypt.encryptFile(file_name, file_name + '.aes', key, buffer_size)
+        fs.delete(name)
 
     def post(self, request, *args, **kwargs):
         folder = 'mail_app/group_files/' + self.get_group_name() + '/'
@@ -72,6 +81,6 @@ class UploadFiles(GroupListCreateAPIView):
             return Response('There is no credentials.json or token.json file', status=400)
 
         fs = FileSystemStorage(location=folder)
-        self.save_file(fs, 'credentials.json', credentials)
-        self.save_file(fs, 'token.json', token)
+        self.save_file(fs, 'credentials.json', credentials, folder)
+        self.save_file(fs, 'token.json', token, folder)
         return Response('Saved', status=200)

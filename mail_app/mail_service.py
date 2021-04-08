@@ -3,6 +3,8 @@ from django.core.files.storage import FileSystemStorage
 
 import pickle
 import ezgmail
+from decouple import config
+import pyAesCrypt
 
 
 class Service:
@@ -17,19 +19,38 @@ class Service:
         application = get_wsgi_application()
         os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
 
+    @staticmethod
+    def encrypt_file(file_name):
+        buffer_size = 64 * 1024
+        key = config('KEY')
+        pyAesCrypt.encryptFile(file_name, file_name + '.aes', key, buffer_size)
+
+    @staticmethod
+    def decrypt_file(file_name):
+        buffer_size = 64 * 1024
+        key = config('KEY')
+        pyAesCrypt.decryptFile(file_name + '.aes', file_name, key, buffer_size)
+
     def start(self):
         from custom_auth.models import Group
         if not self.group:
             groups = Group.objects.all()
-            for group in groups:
-                folder = 'mail_app/group_files/' + group.name + '/'
-                fs = FileSystemStorage(location=folder)
-                if fs.exists('credentials.json') and fs.exists('token.json'):
-                    self.get_mails(folder, group)
         else:
-            group = Group.objects.get(name=self.group)
-            folder = './group_files/' + group.name + '/'
-            self.get_mails(folder, group)
+            groups = (Group.objects.get(name=self.group),)
+        for group in groups:
+            folder = 'mail_app/group_files/' + group.name + '/'
+            fs = FileSystemStorage(location=folder)
+
+            if fs.exists('credentials.json.aes') and fs.exists('token.json.aes'):
+                self.decrypt_file(folder + 'credentials.json')
+                self.decrypt_file(folder + 'token.json')
+
+                self.get_mails(folder, group)
+
+            self.encrypt_file(folder + 'credentials.json')
+            self.encrypt_file(folder + 'token.json')
+            fs.delete('credentials.json')
+            fs.delete('token.json')
 
     def get_mails(self, folder, group):
         ezgmail.init(tokenFile=folder + 'token.json',

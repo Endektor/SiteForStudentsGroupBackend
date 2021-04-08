@@ -53,6 +53,7 @@ packaging==20.9
 prompt-toolkit==3.0.16
 protobuf==3.14.0
 psutil==5.8.0
+pyAesCrypt==5.0.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
