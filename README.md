@@ -1,7 +1,6 @@
 <h1 align="center">Сурикачий сайт</h1>
 
-<img src=https://img.shields.io/badge/made%20by-endektor-blue>
-<img src=https://img.shields.io/badge/open%20source-🧠-brightgreen>
+<img src=https://img.shields.io/badge/made%20by-endektor-blue> <img src=https://img.shields.io/badge/open%20source-🧠-brightgreen>
 
 1. [Задачи проекта](#задачи-проекта)
 1. [В разработке](#в-разработке)
