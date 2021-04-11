@@ -32,7 +32,7 @@ class Create(APIView):
 class Refresh(APIView):
     permission_classes = []
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         refresh_old = request.COOKIES.get('refresh', None)
         try:
             refresh = RefreshToken(refresh_old)
