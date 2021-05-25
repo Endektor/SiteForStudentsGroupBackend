@@ -58,7 +58,7 @@ class Refresh(APIView):
 
         try:
             BlackList.objects.get(refresh_token=refresh_old)
-            return Response({'error': "Invalid refresh token"}, status=401)
+            return Response({'error': "Refresh token is in blacklist"}, status=401)
         except ObjectDoesNotExist:
             pass
 
@@ -67,7 +67,7 @@ class Refresh(APIView):
             refresh_old_obj.delete()
             BlackList(refresh_token=refresh_old).save()
         except ObjectDoesNotExist:
-            return Response({'error': "Invalid refresh token"}, status=401)
+            return Response({'error': "Refresh token is not in whitelist"}, status=401)
 
         try:
             user_id = RefreshToken(refresh_old).get('user_id')
