@@ -34,9 +34,10 @@ class Refresh(APIView):
 
     def get(self, request, *args, **kwargs):
         refresh_old = request.COOKIES.get('refresh', None)
+        if not refresh_old:
+            return Response({'error': "Invalid refresh token"}, status=401)
         try:
             refresh = RefreshToken(refresh_old)
-            print(refresh.get('username'))
         except TokenError:
             return Response({'error': "Invalid refresh token"}, status=400)
 
