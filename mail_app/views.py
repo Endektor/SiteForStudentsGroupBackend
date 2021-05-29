@@ -2,6 +2,10 @@ from django.http import HttpResponse
 from django.views import View
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import generics, permissions
+from django.views.generic import View
+from django.http import HttpResponse
+from django.conf import settings
+import os
 
 from .models import Letter
 from .serializers import *
@@ -17,14 +21,14 @@ class LettersList(generics.ListCreateAPIView):
     queryset = Letter.objects.all().order_by('-date_time')
     serializer_class = LetterSerializer
     pagination_class = LocalPagination
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class LetterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Letter.objects.all()
     serializer_class = LetterSerializer
     lookup_field = 'id'
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class CheckEmail(View):
@@ -34,3 +38,21 @@ class CheckEmail(View):
         service = Service(amount_of_letters=kwargs['id'])
         service.get_mails()
         return HttpResponse(1)
+
+
+class ReactAppView(View):
+
+    def get(self, request):
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        try:
+            with open(os.path.join(BASE_DIR, 'frontend', 'build', 'index.html')) as file:
+                return HttpResponse(file.read())
+
+        except:
+            return HttpResponse(
+                """
+                index.html not found ! build your React app !!
+                """,
+                status=501,
+            )

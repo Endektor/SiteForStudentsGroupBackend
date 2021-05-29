@@ -10,19 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import BlackList, WhiteList
 
 
-# class BlackList:
-#
-#     def check(self, refresh):
-#         pass
-#
-#     def add(self, refresh):
-#         BlackListModel.save(refresh_token=refresh)
-#
-#
-#     def delete(self, refresh):
-#         pass
-
-
 class Create(APIView):
     permission_classes = []
 
@@ -40,9 +27,10 @@ class Create(APIView):
         response.set_cookie(
             'refresh',
             str(refresh),
-            max_age=60 * 24 * 60 * 60,
-            # domain=,
-            # secure=settings.SESSION_COOKIE_SECURE or None,
+            max_age=15 * 24 * 60 * 60,
+            path="/auth",
+            samesite="lax",
+            secure=True,
             httponly=True, )
         return response
 
@@ -58,7 +46,7 @@ class Refresh(APIView):
 
         try:
             BlackList.objects.get(refresh_token=refresh_old)
-            return Response({'error': "Refresh token is in blacklist"}, status=401)
+            return Response({'error': "Refresh token is in blacklist. Possibly somebody has stolen your credentials. You should check your computer for viruses"}, status=401)
         except ObjectDoesNotExist:
             pass
 
@@ -83,9 +71,10 @@ class Refresh(APIView):
         response.set_cookie(
             'refresh',
             str(refresh),
-            max_age=60 * 24 * 60 * 60,
-            # domain=,
-            # secure=settings.SESSION_COOKIE_SECURE or None,
+            max_age=15 * 24 * 60 * 60,
+            path="/auth",
+            secure=True,
+            samesite="lax",
             httponly=True, )
         return response
 

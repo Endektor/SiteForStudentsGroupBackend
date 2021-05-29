@@ -10,4 +10,5 @@ urlpatterns = [
     url('jwt/create/$', auth_views.Create.as_view()),
     url('jwt/refresh/$', auth_views.Refresh.as_view()),
     url('jwt/verify/$', auth_views.Verify.as_view()),
+    url('jwt/rejectrefresh/$', auth_views.RejectRefresh.as_view()),
 ]

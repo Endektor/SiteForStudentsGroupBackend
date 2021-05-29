@@ -15,12 +15,12 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-#ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['aficionadoleague.ru']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
-       'https://localhost:3000',
+       'https://aficionadoleague.ru',
 )
 
 # Application definition
@@ -94,8 +94,8 @@ DJOSER = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -181,6 +181,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR + '/static'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'frontend/build/static'),
+)
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR + '/media'
