@@ -1,4 +1,4 @@
-<h1 align="center">Сурикачий сайт</h1>
+<h1 align="center">Сайт для группы студентов</h1>
 
 <img src=https://img.shields.io/badge/made%20by-endektor-blue> <img src=https://img.shields.io/badge/open%20source-🧠-brightgreen>
 
