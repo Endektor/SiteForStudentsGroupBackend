@@ -10,3 +10,4 @@ debug.log
 .env
 mail_app/mail_data.json
 /venv
+celerybeat*
