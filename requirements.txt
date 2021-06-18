@@ -16,7 +16,7 @@ colorama==0.4.4
 cprint==1.1
 cryptography==3.3.2
 defusedxml==0.7.0rc1
-Django==3.0.14
+Django==3.1.12
 django-colorfield==0.3.2
 django-cors-headers==3.4.0
 django-templated-mail==1.1.1
