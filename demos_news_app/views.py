@@ -24,7 +24,7 @@ class PostList(generics.ListCreateAPIView):
         try:
             tags = tags.split(',')
             tags = list(map(int, tags))
-            posts = Post.objects.filter(tag__in=tags)
+            posts = Post.objects.filter(tags__in=tags)
             return posts.order_by('date')
 
         except ValueError:

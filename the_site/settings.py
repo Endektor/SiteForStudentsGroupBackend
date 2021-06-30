@@ -18,7 +18,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['aficionadoleague.ru', 'backend']
+ALLOWED_HOSTS = ['aficionadoleague.ru', 'backend', '*']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
