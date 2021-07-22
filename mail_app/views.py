@@ -35,7 +35,7 @@ class CheckEmail(View):
 
     @staticmethod
     def get(request, *args, **kwargs):
-        service = Service(amount_of_letters=kwargs['id'])
+        service = Service()
         service.get_mails()
         return HttpResponse(1)
 

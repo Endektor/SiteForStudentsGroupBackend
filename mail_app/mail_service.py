@@ -1,10 +1,10 @@
-import pickle
-import ezgmail
+from decouple import config
 from django.utils.timezone import make_aware
 
+import pickle
 import imaplib
-from decouple import config
 import email
+
 
 class Service:
     """
@@ -26,33 +26,47 @@ class Service:
 
     def get_mails(self):
         latest_uid = self.get_latest_uid()
-        print(latest_uid)
-        uids_list = self.get_list_of_uids(latest_uid)
-        letters = self.get_letters(uids_list)
+        dumped_uid = self.uid_extract()
+        uid_list = self.get_list_of_uid(latest_uid, dumped_uid)
+        letters = self.get_letters(uid_list)
+        self.uid_dump(latest_uid)
 
     def get_latest_uid(self):
         result, data = self.mailbox.uid('search', None, "ALL")
-        latest_email_uid = data[0].split()[-1]
-        return latest_email_uid
+        return int(data[0].split()[-1])
 
     @staticmethod
-    def get_list_of_uids(new_uid):
-        with open('mail_app/mail_data.json', 'wb') as data_file:
-            pickle.dump({'latest_uid': '607'}, data_file)
-        with open('mail_app/mail_data.json', 'rb+') as data_file:
-            data = pickle.load(data_file)
-            pickle.dump({'latest_uid': str(new_uid)}, data_file)
-        old_uid = int(data['latest_uid'])
+    def uid_extract():
+        try:
+            with open('mail_app/mail_data.json', 'rb') as data_file:
+                data = pickle.load(data_file)
+            return int(data['latest_uid'])
 
-        if int(new_uid) > old_uid:
-            return [uid for uid in range(old_uid, int(new_uid) + 1)]
-        return []
+        except FileNotFoundError:
+            # with open('mail_app/mail_data.json', 'wb') as data_file:
+            #     pickle.dump({'latest_uid': '607'}, data_file)
+            return 0    # Returns zero as the first uid
+
+    @staticmethod
+    def uid_dump(new_uid):
+        with open('mail_app/mail_data.json', 'wb+') as data_file:
+            pickle.dump({'latest_uid': str(new_uid)}, data_file)
+
+    @staticmethod
+    def get_list_of_uid(new_uid, old_uid):
+        return [uid for uid in range(new_uid, old_uid, -1)]
 
     def get_letters(self, uids_list):
         letters_list = []
-        result, data = self.mailbox.uid('fetch', ','.join(map(str, uids_list)), '(RFC822)')
-        email_message = email.message_from_string(data[0][0])
+        # result, data = self.mailbox.uid('fetch', ','.join(map(str, uids_list)), '(RFC822)')
+        result, data = self.mailbox.uid('fetch', '608', '(RFC822)')
+        # print(data[0])
+        email_message = email.message_from_bytes(data[0][1])
         print(email_message)
+        #
+        # print(email.utils.parseaddr(email_message['From']))
+        #
+        # print(email_message.items())
         # if data == [None]:
         #     return []
         # raw_email = data[0][1]

@@ -12,9 +12,8 @@ class MailAppConfig(AppConfig):
 
     @staticmethod
     def start_mail_service():
-        print("lol")
         while True:
-            sleep(10)
+            sleep(5)
             print('Mail check ' + datetime.datetime.today().strftime("%H.%M.%S"), flush=True)
             service = Service()
             service.get_mails()
@@ -22,8 +21,6 @@ class MailAppConfig(AppConfig):
 
     def ready(self):
         mail_for_debug = True
-        print(os.environ.get('RUN_MAIN', None))
-        print(os.environ.get('Mail_env', None))
         if os.environ.get('RUN_MAIN', None) != 'true' and \
                 not os.environ.get('Mail_env', None) == 'true' and \
                 mail_for_debug:
