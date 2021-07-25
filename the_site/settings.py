@@ -18,12 +18,14 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['aficionadoleague.ru', 'backend', '*']
+ALLOWED_HOSTS = ['aficionadoleague.ru', 'backend', '*', 'localhost', 'localhost:3000']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
        'https://aficionadoleague.ru',
+       'http://aficionadoleague.ru',
+       'http://localhost:3000/'
 )
 
 # Application definition
@@ -83,9 +85,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ),
+    #'DEFAULT_PERMISSION_CLASSES': (
+    #    'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    #),
 }
 
 DJOSER = {

@@ -5,25 +5,28 @@ from django.utils.timezone import make_aware
 
 class Service:
     def __init__(self, amount_of_letters=10):
-        self.latest_letters = ezgmail.recent(maxResults=amount_of_letters)
+        self.latest_letters = ezgmail.recent(maxResults=amount_of_letters).reverse()
 
         import os
+        import sys
         os.environ["Mail_env"] = 'true'
+        sys.path.append("/usr/src/backend/")
+        sys.path.append("/usr/src/backend/mail_app")
         from django.core.wsgi import get_wsgi_application
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'the_site.settings')
         application = get_wsgi_application()
         os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = 'true'
 
     def get_mails(self):
-        from .models import Letter, Attachment
+        from mail_app.models import Letter, Attachment
         try:
-            with open('mail_app/mail_data.json', 'rb') as data_file:
+            with open('mail_data.json', 'rb') as data_file:
                 downloaded_summary = pickle.load(data_file)
                 mail_data_exists = True
         except FileNotFoundError:
             downloaded_summary = None
             mail_data_exists = False
-            self.latest_letters = ezgmail.search('in=inbox')
+        self.latest_letters = ezgmail.search('in=inbox')
 
         for letter in self.latest_letters:
             letter = letter.messages[0]
@@ -43,6 +46,6 @@ class Service:
                     attachment.letter = letter_obj
                     attachment.save()
 
-        with open('mail_app/mail_data.json', 'wb') as data_file:
+        with open('mail_data.json', 'wb') as data_file:
             latest_letter_summary = ezgmail.summary(self.latest_letters[0], printInfo=False)
             pickle.dump(latest_letter_summary, data_file)
