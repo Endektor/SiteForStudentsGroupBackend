@@ -18,14 +18,15 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['aficionadoleague.ru', 'backend', '*', 'localhost', 'localhost:3000']
+ALLOWED_HOSTS = ['aficionadoleague.ru', 'backend', '*', 'localhost', 'localhost:3000', '80.78.240.154']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
        'https://aficionadoleague.ru',
        'http://aficionadoleague.ru',
-       'http://localhost:3000/'
+       'http://localhost:3000/',
+       'http://80.78.240.154/'
 )
 
 # Application definition

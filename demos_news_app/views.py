@@ -19,14 +19,13 @@ class PostList(generics.ListCreateAPIView):
     pagination_class = LocalPagination
 
     def get_queryset(self):
-        tags = self.request.GET.get('tags', 'error')
-
-        try:
+        tags = self.request.GET.get('tags', None)
+        if tags:
             tags = tags.split(',')
             posts = Post.objects.filter(tags__name__in=tags)
             return posts.order_by('date')
 
-        except ValueError:
+        else:
             return Post.objects.all().order_by('date')
 
     def perform_create(self, serializer):
