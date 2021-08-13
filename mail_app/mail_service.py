@@ -1,9 +1,11 @@
+from dateutil.parser import parse
 from decouple import config
-from django.utils.timezone import make_aware
+from email.header import decode_header
 
-import pickle
-import imaplib
 import email
+import imaplib
+import os
+import pickle
 
 
 class Service:
@@ -26,7 +28,7 @@ class Service:
 
     def get_mails(self):
         latest_uid = self.get_latest_uid()
-        dumped_uid = self.uid_extract()
+        dumped_uid = self.get_previous_uid()
         uid_list = self.get_list_of_uid(latest_uid, dumped_uid)
         letters = self.get_letters(uid_list)
         self.uid_dump(latest_uid)
@@ -36,7 +38,7 @@ class Service:
         return int(data[0].split()[-1])
 
     @staticmethod
-    def uid_extract():
+    def get_previous_uid():
         try:
             with open('mail_app/mail_data.json', 'rb') as data_file:
                 data = pickle.load(data_file)
@@ -59,10 +61,69 @@ class Service:
     def get_letters(self, uids_list):
         letters_list = []
         # result, data = self.mailbox.uid('fetch', ','.join(map(str, uids_list)), '(RFC822)')
-        result, data = self.mailbox.uid('fetch', '608', '(RFC822)')
-        # print(data[0])
-        email_message = email.message_from_bytes(data[0][1])
-        print(email_message)
+        result, data = self.mailbox.uid('fetch', '620', '(RFC822)')
+        uid = 620
+        email_message = email.message_from_bytes(data[0][1], _class=email.message.EmailMessage)
+
+        msg = email.message_from_bytes(data[0][1])
+        subject, encoding = decode_header(msg["Subject"])[0]
+        if isinstance(subject, bytes):
+            subject = subject.decode(encoding)
+        sender, encoding = decode_header(msg.get("From"))[0]
+        if isinstance(sender, bytes) and encoding:
+            sender = sender.decode(encoding)
+        date_time, qw = decode_header(msg.get("Date"))[0]
+        date_time = parse(date_time)
+
+
+        body = "Во время чтения сообщения произошла ошибка или тело письма пустое."
+
+
+        folder_name = "media/mail_attachments/"
+        attachments = []
+
+        if msg.is_multipart():
+            for part in msg.walk():
+                content_disposition = str(part.get("Content-Disposition"))
+                try:
+                    body = part.get_payload(decode=True).decode()
+                except:
+                    pass
+
+                if "attachment" in content_disposition:
+                    filename, encoding = decode_header(part.get_filename())[0]
+                    if isinstance(filename, bytes) and encoding:
+                        filename = filename.decode(encoding)
+                    filepath = os.path.join(folder_name, filename)
+                    attachments.append(filepath)
+                    open(filepath, "wb").write(part.get_payload(decode=True))
+        else:
+            body = msg.get_payload(decode=True).decode()
+
+        from .models import Letter, Attachment
+
+        letter_obj = Letter(mailer=sender,
+                            topic=subject,
+                            text=body,
+                            date_time=date_time,
+                            uid=uid)
+        letter_obj.save()
+
+        for filepath in attachments:
+            attachment = Attachment()
+            attachment.file.name = filepath
+            attachment.letter = letter_obj
+            attachment.save()
+
+        # if email_message.is_multipart():
+        #     for payload in email_message.get_payload():
+        #         body = payload.get_payload(decode=True).decode('utf-8')
+        #         print(body)
+        # else:
+        #     body = email_message.get_payload(decode=True).decode('utf-8')
+        #     print(body)
+        # print(email_message.items())
+        # print(email.utils.getaddresses(email_message))
         #
         # print(email.utils.parseaddr(email_message['From']))
         #

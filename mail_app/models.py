@@ -8,6 +8,7 @@ class Letter(models.Model):
     topic = models.CharField(blank=True, max_length=256)
     text = models.TextField(blank=True)
     date_time = models.DateTimeField()
+    uid = models.IntegerField(unique=True)
 
     def __str__(self):
         return self.topic
