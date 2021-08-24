@@ -1,8 +1,8 @@
 from celery import Celery
-import datetime
 
 from .mail_service import Service
 
+import datetime
 
 app = Celery('mail_celery')
 app.conf.broker_url = 'redis://localhost:6379/0'

@@ -1,6 +1,7 @@
 from datetime import timedelta
-import os
 from decouple import config
+
+import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,12 +16,13 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['aficionadoleague.ru']
+ALLOWED_HOSTS = ['aficionadoleague.ru', "127.0.0.1:8000", "127.0.0.1"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
-       'https://aficionadoleague.ru',
+    'https://aficionadoleague.ru',
+    "http://127.0.0.1:8000"
 )
 
 # Application definition
