@@ -19,23 +19,21 @@ class PostList(generics.ListCreateAPIView):
     pagination_class = LocalPagination
 
     def get_queryset(self):
-        tags = self.request.GET.get('tags', 'error')
-
-        try:
+        tags = self.request.GET.get('tags', None)
+        if tags:
             tags = tags.split(',')
-            tags = list(map(int, tags))
-            posts = Post.objects.filter(tag__in=tags)
+            posts = Post.objects.filter(tags__name__in=tags)
             return posts.order_by('date')
 
-        except ValueError:
+        else:
             return Post.objects.all().order_by('date')
 
     def perform_create(self, serializer):
         tags = self.request.data.get('tags', None)
         if tags:
-            tags = list(map(int, tags.split(',')))
-            tags = Tag.objects.filter(id__in=tags)
-            serializer.save(author=self.request.user, tags=tags)
+            tags = tags.split(',')
+            tags_objs = [Tag.objects.get_or_create(name=tag_name)[0] for tag_name in tags] 
+            serializer.save(author=self.request.user, tags=tags_objs)
         else:
             serializer.save(author=self.request.user)
 
@@ -44,14 +42,17 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     lookup_field = 'id'
-    permission_classes = [IsOwnerOrReadOnly, permissions.IsAuthenticated]
+    #permission_classes = [IsOwnerOrReadOnly, permissions.IsAuthenticated]
 
     def put(self, request, *args, **kwargs):
         tags = request.data.get('tags', None)
         if tags:
-            tags = list(map(int, tags.split(',')))
+            tags = tags.split(',')
+            tags_objs = [Tag.objects.get_or_create(name=tag_name)[0] for tag_name in tags]
             post = Post.objects.get(id=kwargs.get('id'))
-            post.tags.set(Tag.objects.filter(id__in=tags))
+            #post.tags.set(Tag.objects.filter(id__in=tags))
+            print(tags_objs)
+            post.tags.set(tags_objs)
             post.save()
 
         return self.update(request, *args, **kwargs)
@@ -65,5 +66,5 @@ class TagList(generics.ListCreateAPIView):
 class TagDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    lookup_field = 'id'
-    permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated]
+    lookup_field = 'name'
+    #permission_classes = [permissions.DjangoObjectPermissions, permissions.IsAuthenticated]
