@@ -6,7 +6,8 @@ class CustomDateTimeField(models.DateTimeField):
         val = self.value_from_object(obj)
         if val:
             val.replace(microsecond=0)
-            return val.isoformat(sep=' ')
+            val.isoformat(sep=' ')
+            return val.strftime("%Y.%M.%D %I:%M")
         return ''
 
 
