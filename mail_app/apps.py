@@ -20,7 +20,7 @@ class MailAppConfig(AppConfig):
             sleep(60 * 5)
 
     def ready(self):
-        mail_for_debug = True
+        mail_for_debug = False
         if os.environ.get('RUN_MAIN', None) != 'true' and \
                 not os.environ.get('Mail_env', None) == 'true' and \
                 mail_for_debug:
