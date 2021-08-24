@@ -1,10 +1,11 @@
-import datetime
-import os
-from time import sleep
 from django.apps import AppConfig
 from multiprocessing import Process
+from time import sleep
 
 from .mail_service import Service
+
+import datetime
+import os
 
 
 class MailAppConfig(AppConfig):

@@ -1,16 +1,13 @@
-from django.http import HttpResponse
-from django.views import View
-from rest_framework.pagination import PageNumberPagination
-from rest_framework import generics, permissions
 from django.views.generic import View
 from django.http import HttpResponse
-from django.conf import settings
-import os
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import generics, permissions
 
 from .models import Letter
 from .serializers import *
-
 from .mail_service import Service
+
+import os
 
 
 class LocalPagination(PageNumberPagination):

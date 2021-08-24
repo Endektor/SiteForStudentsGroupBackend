@@ -1,6 +1,4 @@
 from django.db import models
-from datetime import date
-from django.utils import timezone
 
 
 class CustomDateTimeField(models.DateTimeField):

@@ -1,12 +1,10 @@
 from dateutil.parser import parse
 from decouple import config
 from email.header import decode_header
-from itertools import product
 
 import email
 import imaplib
 import os
-import pickle
 
 
 class Service:
