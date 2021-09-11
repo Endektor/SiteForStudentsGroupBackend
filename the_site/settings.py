@@ -26,8 +26,6 @@ CORS_ORIGIN_WHITELIST = (
     'http://devgang.online',
     'http://localhost',
     'http://localhost:3000',
-    'http://localhost/',
-    'http://localhost:3000/',
 )
 
 # Application definition
@@ -121,16 +119,16 @@ EMAIL_USE_TLS = True
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
-
 DATABASES = {
-    'default': env.db(),
+   'default': {
+       'ENGINE': 'django.db.backends.sqlite3',
+       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+   }
 }
+
+# DATABASES = {
+#     'default': env.db(),
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('mailer', models.CharField(max_length=128)),
                 ('topic', models.CharField(blank=True, max_length=256)),
                 ('text', models.TextField(blank=True)),
-                ('date_time', mail_app.models.CustomDateTimeField()),
+                ('date_time', models.DateTimeField()),
                 ('uid', models.IntegerField(unique=True)),
             ],
         ),
