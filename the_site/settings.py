@@ -17,15 +17,17 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['aficionadoleague.ru', 'backend', '*', 'localhost', 'localhost:3000', '80.78.240.154']
+ALLOWED_HOSTS = ['devgang.online', 'backend', '*', 'localhost:3000', 'localhost']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
-       'https://aficionadoleague.ru',
-       'http://aficionadoleague.ru',
-       'http://localhost:3000/',
-       'http://80.78.240.154/'
+    'https://devgang.online',
+    'http://devgang.online',
+    'http://localhost',
+    'http://localhost:3000',
+    'http://localhost/',
+    'http://localhost:3000/',
 )
 
 # Application definition
@@ -91,11 +93,14 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {},
+    'EMAIL': {
+            'activation': 'mail_app.emails.ActivationEmail',
+    }
 }
 
 SIMPLE_JWT = {

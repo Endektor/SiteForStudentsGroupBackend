@@ -62,16 +62,15 @@ class Refresh(APIView):
             user = User.objects.get(id=user_id)
             refresh = RefreshToken().for_user(user)
             WhiteList(refresh_token=refresh, user=user).save()
-            print(refresh)
-            print(refresh_old)
         except TokenError:
             return Response({'error': "Invalid refresh token"}, status=400)
 
         response = Response({'access': str(refresh.access_token)}, status=200)
+        one_day = 24 * 60 * 60
         response.set_cookie(
             'refresh',
             str(refresh),
-            max_age=15 * 24 * 60 * 60,
+            max_age=15 * one_day,
             path="/auth",
             secure=True,
             samesite="lax",

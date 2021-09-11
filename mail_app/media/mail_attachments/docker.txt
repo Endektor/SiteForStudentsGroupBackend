@@ -1,0 +1,26 @@
+    redis:
+        image: "redis:alpine"
+        command: redis-server
+        ports:
+          - "6379:6379"
+        volumes:
+          - ./redis/redis-data:/var/lib/redis
+          - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+        environment:
+          - REDIS_REPLICATION_MODE=master
+
+
+    celery:
+        build:
+            context: ./backend
+            dockerfile: DockerfileCelery
+        command: sh -c "celery -A mail_celery worker -l info -B"
+        environment:
+            - DEBUG=1
+            - DATABASE_URL=postgresql://django_traefik:django_traefik@db:5432/django_traefik
+        volumes:
+            - ./backend:/usr/src/backend
+        depends_on:
+            - db
+        links:
+            - redis

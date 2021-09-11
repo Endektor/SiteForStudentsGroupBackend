@@ -2,10 +2,15 @@ from dateutil.parser import parse
 from decouple import config
 from email.header import decode_header
 
+from bs4 import BeautifulSoup
+
 import email
 import imaplib
 import os
+import html2text
 
+from .mail_celery import app as celery_app
+celery_app__all__ = ['celery_app']
 
 class Service:
     """
@@ -22,7 +27,7 @@ class Service:
         os.environ["Mail_env"] = "true"     # prevents creating several processes with service in debug mode
         from django.core.wsgi import get_wsgi_application
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "the_site.settings")
-        get_wsgi_application()
+        application = get_wsgi_application()
         os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
     def get_mails(self):
@@ -110,6 +115,8 @@ class Service:
                         open(filepath, "wb").write(part.get_payload(decode=True))
             else:
                 text = letter.get_payload(decode=True).decode()
+            
+            text = html2text.html2text(text)
 
             letters_list.append({
                 "uid": uid,

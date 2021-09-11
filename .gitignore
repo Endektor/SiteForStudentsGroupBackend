@@ -2,7 +2,6 @@
 /media
 /static
 db*
-*/migrations/
 */__pycache__/
 token.json
 credentials.json

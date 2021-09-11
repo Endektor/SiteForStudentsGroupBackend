@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from .models import Post, Tag
 from django.contrib.auth.models import User
+from django.utils import timezone
+
+from .models import Post, Tag
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -20,6 +22,7 @@ class TagSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
+    date = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S", default=timezone.now)
 
     class Meta:
         model = Post

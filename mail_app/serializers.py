@@ -11,6 +11,7 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 class LetterSerializer(serializers.ModelSerializer):
     letter = AttachmentSerializer(many=True)
+    date_time = serializers.DateTimeField(format="%d-%m-%Y %H:%M:%S")
 
     class Meta:
         model = Letter

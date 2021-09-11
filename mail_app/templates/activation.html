@@ -1,0 +1,34 @@
+{% block subject %}
+    Активация аккаунта на сайте {{ site_name }}
+{% endblock subject %}
+
+{% block text_body %}
+    Вы получили это письмо, потому что Ваша почта была использована при регистрации на сайте {{ site_name }}.
+
+    Пожалуйста, для активации Вашего аккаунта перейдите по ссылке ниже:
+    {{ protocol }}://{{ domain }}/{{ url|safe }}
+
+    Спасибо, что выбрали наш сайт!
+{% endblock text_body %}
+
+{% block html_body %}
+
+    <div style="font-family: Georgia sans-serif;margin-bottom: 40px;padding: 20px 20px 0;">
+        <div style="display: flex;justify-content: space-between;padding-bottom: 20px;font-size: 22px;border-bottom: 1px solid #979797;">
+            <div>Активация аккаунта на сайте {{ site_name }}</div>
+        </div>
+        <div style="padding: 20px 20px 0;border-bottom: 1px solid #979797;">
+            <div style="font-size: 20px;margin-bottom: 20px;align-items: center;">
+                <div style="margin-bottom: 10px;">Пожалуйста, для активации Вашего аккаунта перейдите по ссылке ниже:
+                </div>
+                <a href="{{ protocol }}://{{ domain }}/{{ url|safe }}"
+                   style="margin-bottom: 20px; font-size: 16px; word-break: break-all;" target="_blank">{{ protocol }}://{{ domain }}/{{ url|safe }}</a>
+
+            </div>
+        </div>
+        <div style="padding: 20px 0;font-size: 20px;">
+            <div>Спасибо, что выбрали наш сайт!</div>
+        </div>
+    </div>
+
+{% endblock html_body %}

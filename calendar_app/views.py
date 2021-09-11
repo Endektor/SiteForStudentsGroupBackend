@@ -1,5 +1,6 @@
 from rest_framework.generics import get_object_or_404
 from rest_framework import generics
+from rest_framework import permissions
 
 from .models import Day, Info, Event
 from .serializers import *
@@ -8,6 +9,7 @@ from .serializers import *
 class Dayslist(generics.ListAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         year = self.kwargs.get('year', 0)
@@ -20,6 +22,7 @@ class DayDetail(generics.RetrieveAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
     lookup_field = 0
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         queryset = self.get_queryset()
@@ -33,6 +36,7 @@ class DayDetail(generics.RetrieveAPIView):
 class Infolist(generics.ListAPIView):
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 # class TagDetail(generics.RetrieveUpdateDestroyAPIView):

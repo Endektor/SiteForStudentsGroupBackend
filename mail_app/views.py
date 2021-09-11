@@ -18,15 +18,14 @@ class LettersList(generics.ListCreateAPIView):
     queryset = Letter.objects.all().order_by('-date_time')
     serializer_class = LetterSerializer
     pagination_class = LocalPagination
-    permission_classes = []
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class LetterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Letter.objects.all()
     serializer_class = LetterSerializer
     lookup_field = 'id'
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class CheckEmail(View):
