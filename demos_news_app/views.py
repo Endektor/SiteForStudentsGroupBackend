@@ -2,6 +2,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import exceptions
 from rest_framework import generics
 from rest_framework import permissions
+from django.db.models import Q
 
 from demos_news_app.permissions import IsOwnerOrReadOnly
 from .models import Post, Tag
@@ -23,7 +24,10 @@ class PostList(generics.ListCreateAPIView):
         if tags:
             tags = tags.split(',')
             tags = [tag.strip() for tag in tags]
-            posts = self.queryset.filter(tags__name__in=tags)
+
+            posts = self.queryset
+            for tag in tags:
+                posts = posts.filter(tags__name=tag)
             return posts
 
         else:
