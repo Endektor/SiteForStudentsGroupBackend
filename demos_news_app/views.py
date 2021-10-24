@@ -1,8 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import exceptions
 from rest_framework import generics
 from rest_framework import permissions
-from django.db.models import Q
 
 from demos_news_app.permissions import IsOwnerOrReadOnly
 from .models import Post, Tag

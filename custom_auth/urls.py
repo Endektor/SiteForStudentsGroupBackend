@@ -11,4 +11,6 @@ urlpatterns = [
     url('jwt/refresh/$', auth_views.Refresh.as_view()),
     url('jwt/verify/$', auth_views.Verify.as_view()),
     url('jwt/rejectrefresh/$', auth_views.RejectRefresh.as_view()),
+
+    url(r'user/(?P<username>[a-zA-Z0-9]+)$', auth_views.UserDetail.as_view()),
 ]

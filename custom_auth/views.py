@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from rest_framework import generics
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
@@ -8,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 from .models import BlackList, WhiteList
+from .serializers import UserSerializer
 
 
 class Create(APIView):
@@ -103,3 +106,10 @@ class RejectRefresh(APIView):
         if not refresh_old:
             BlackList(refresh_token=refresh_old).save()
         return Response('OK', status=200)
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+    permission_classes = [permissions.IsAuthenticated]
