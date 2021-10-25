@@ -26,6 +26,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://devgang.online',
     'http://localhost',
     'http://localhost:3000',
+    'http://localhost:8000',
 )
 
 # Application definition
@@ -100,7 +101,8 @@ DJOSER = {
     'SERIALIZERS': {},
     'EMAIL': {
             'activation': 'mail_app.emails.ActivationEmail',
-    }
+    },
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True
 }
 
 SIMPLE_JWT = {
