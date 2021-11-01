@@ -7,7 +7,6 @@ from colorfield.fields import ColorField
 
 class Day(models.Model):
     date = models.DateField("Дата", unique=True, default=date.today)
-    topic = models.CharField("Заголовок", blank=True, max_length=256)
 
     def __str__(self):
         return f"{str(self.date.day)}/{str(self.date.month)}/{str(self.date.year)}"
