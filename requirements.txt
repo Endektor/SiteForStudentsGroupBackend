@@ -42,6 +42,7 @@ greenlet==1.0.0
 gunicorn
 html2text==2020.1.16
 httplib2==0.18.1
+icalendar==4.0.9
 icecream==2.1.0
 idna==2.10
 IMAPClient==2.2.0

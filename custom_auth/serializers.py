@@ -25,8 +25,12 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    posts = PostSerializer(many=True, read_only=True)
+    posts = serializers.SerializerMethodField()
 
+    def get_posts(self, obj):
+        ordered_queryset = obj.posts.order_by('-date') 
+        return PostSerializer(ordered_queryset, many=True, context=self.context).data
+    
     class Meta:
         model = User
         fields = ('id', 'username', 'posts', 'email')

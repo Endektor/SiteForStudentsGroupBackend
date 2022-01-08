@@ -17,13 +17,13 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['devgang.online', 'backend', '*', 'localhost:3000', 'localhost']
+ALLOWED_HOSTS = ['studorg.online', 'dev.studorg.online', 'backend', '*', 'localhost:3000', 'localhost']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
-    'https://devgang.online',
-    'http://devgang.online',
+    'https://dev.studorg.online',
+    'http://dev.studorg.online',
     'http://localhost',
     'http://localhost:3000',
     'http://localhost:8000',
@@ -102,12 +102,12 @@ DJOSER = {
     'EMAIL': {
             'activation': 'mail_app.emails.ActivationEmail',
     },
-    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -130,9 +130,9 @@ DATABASES = {
    }
 }
 
-# DATABASES = {
-#     'default': env.db(),
-# }
+#DATABASES = {
+#    'default': env.db(),
+#}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

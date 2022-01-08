@@ -14,3 +14,4 @@ COPY custom_auth custom_auth
 COPY the_site the_site
 COPY demos_news_app demos_news_app
 COPY mail_app mail_app
+COPY M4O.ics M4O.ics

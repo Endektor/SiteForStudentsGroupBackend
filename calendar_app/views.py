@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from .models import Day, Info, Event
 from .serializers import *
@@ -42,21 +43,24 @@ class Infolist(generics.ListAPIView):
 class GetSchedule(APIView):
     permission_classes = [permissions.IsAdminUser]
 
-    def get(self):
+    def get(self, request, *args, **kwargs):
         from icalendar import Calendar
 
-        with open('M4O.ics', 'rb') as ics_file:
+        with open("M4O.ics", "rb") as ics_file:
             calendar = Calendar.from_ical(ics_file.read())
 
         for component in calendar.walk():
             if component.name == "VEVENT":
-                start_datetime = component.get('dtstart').dt
+                start_datetime = component.get("dtstart").dt
 
                 date_obj = Day.objects.get_or_create(date=start_datetime.date())
-                event_obj = Event.objects.get_or_create(description=component.get('summary'),
-                                                        day=date_obj,
+                event_obj = Event.objects.get_or_create(description=component.get("summary"),
+                                                        day=date_obj[0],
                                                         event_info=Info.objects.get(topic="Пара"),
                                                         time=start_datetime)
+        return(Response("1", status=200))
+                #date_obj[0].event = event_obj
+                #date_obj.save()
 
 
 # class TagDetail(generics.RetrieveUpdateDestroyAPIView):
