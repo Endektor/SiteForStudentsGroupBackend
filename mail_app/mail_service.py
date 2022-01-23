@@ -93,7 +93,10 @@ class Service:
             letter = email.message_from_bytes(letter[1])
 
             uid = uid.split()[2]
-            topic = self.get_header(letter, "Subject")
+            try:
+                topic = self.get_header(letter, "Subject")
+            except:
+                topic = "<Без темы>"
             mailer = self.get_header(letter, "From")
             date_time, qw = decode_header(letter.get("Date"))[0]
             date_time = parse(date_time)

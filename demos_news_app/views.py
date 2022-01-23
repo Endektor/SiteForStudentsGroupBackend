@@ -55,12 +55,15 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def put(self, request, *args, **kwargs):
         tags = request.data.get('tags', None)
+        picture = request.data.get('delete_picture', None)
         if tags:
             tags = tags.split(',')
             tags = [tag.strip() for tag in tags]
             tags_objs = [Tag.objects.get_or_create(name=tag_name)[0] for tag_name in tags]
             post = Post.objects.get(id=kwargs.get('id'))
             post.tags.set(tags_objs)
+            if picture == "true":
+                post.picture.delete(save=False)
             post.save()
 
         return self.update(request, *args, **kwargs)
