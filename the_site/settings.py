@@ -17,16 +17,13 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['studorg.online', 'dev.studorg.online', 'backend', '*', 'localhost:3000', 'localhost']
+ALLOWED_HOSTS = ['studorg.online', 'backend']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
-    'https://dev.studorg.online',
-    'http://dev.studorg.online',
-    'http://localhost',
-    'http://localhost:3000',
-    'http://localhost:8000',
+    'https://studorg.online',
+    'http://studorg.online',
 )
 
 # Application definition
@@ -106,8 +103,8 @@ DJOSER = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -123,16 +120,16 @@ EMAIL_USE_TLS = True
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-   }
-}
-
 #DATABASES = {
-#    'default': env.db(),
+#   'default': {
+#       'ENGINE': 'django.db.backends.sqlite3',
+#       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#   }
 #}
+
+DATABASES = {
+    'default': env.db(),
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
