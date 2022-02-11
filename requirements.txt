@@ -58,7 +58,7 @@ openapi-codec==1.3.2
 packaging==20.9
 Pillow==8.3.2
 prompt-toolkit==3.0.16
-protobuf==3.14.0
+protobuf==3.15.0
 psutil==5.8.0
 psycopg2-binary==2.8.6
 pyAesCrypt==5.0.0
