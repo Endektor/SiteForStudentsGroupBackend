@@ -17,7 +17,7 @@ colorama==0.4.4
 coreapi==2.3.3
 coreschema==0.0.4
 cprint==1.1
-cryptography==3.1.1
+cryptography==3.3.2
 defusedxml==0.7.0rc1
 Django==3.0.7
 django-colorfield==0.3.2
